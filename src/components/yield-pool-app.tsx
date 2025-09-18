@@ -13,7 +13,7 @@ import AdminSection from "~/components/admin-section";
 import ViralShare from "~/components/viral-share";
 import ReferralSystem from "~/components/referral-system";
 import CustomYieldPools from "~/components/custom-yield-pools";
-import CommunityForum from "~/components/community-forum";
+import ActivePoolChat from "~/components/active-pool-chat";
 import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
@@ -255,7 +255,7 @@ export default function YieldPoolApp() {
             className={`${activeTab === "community" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
           >
             <MessageSquare className="w-3 h-3 mr-1" />
-            Forum
+            Chat
           </Button>
           <Button
             variant={activeTab === "share" ? "default" : "ghost"}
@@ -475,7 +475,7 @@ export default function YieldPoolApp() {
         )}
 
         {activeTab === "community" && (
-          <CommunityForum userPools={[...pools, ...customPools]} />
+          <ActivePoolChat userPools={[...pools, ...customPools]} totalBurned={totalBurned} />
         )}
 
         {activeTab === "admin" && (
