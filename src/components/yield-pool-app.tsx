@@ -36,7 +36,7 @@ export default function YieldPoolApp() {
     rewardPercentage: 10,
     contributionAmount: ""
   });
-  const [isPaid, setIsPaid] = useState(false);
+  const [hasTokensLocked, setHasTokensLocked] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -47,10 +47,10 @@ export default function YieldPoolApp() {
   };
 
   const handleCreatePool = () => {
-    if (!isPaid) {
+    if (!hasTokensLocked) {
       toast({
-        title: "Payment Required",
-        description: "Please complete the $10 USDC registration fee first.",
+        title: "Samish Tokens Required",
+        description: "Please purchase and lock $10 worth of Samish Creator tokens first.",
         variant: "destructive"
       });
       return;
@@ -84,7 +84,7 @@ export default function YieldPoolApp() {
       rewardPercentage: 10,
       contributionAmount: ""
     });
-    setIsPaid(false);
+    setHasTokensLocked(false);
 
     toast({
       title: "Pool Created Successfully",
@@ -92,11 +92,11 @@ export default function YieldPoolApp() {
     });
   };
 
-  const handlePaymentComplete = () => {
-    setIsPaid(true);
+  const handleTokenLockComplete = () => {
+    setHasTokensLocked(true);
     toast({
-      title: "Payment Confirmed",
-      description: "Registration fee paid. You can now create your yield pool."
+      title: "Tokens Locked Successfully",
+      description: "$5 burned, $5 refundable. You can now create your yield pool."
     });
   };
 
@@ -189,8 +189,8 @@ export default function YieldPoolApp() {
                     <p>Platform: Zora Network</p>
                   </div>
                   <SamishTokenPurchase
-                    onPurchaseComplete={handlePaymentComplete}
-                    isPurchased={isPaid}
+                    onPurchaseComplete={handleTokenLockComplete}
+                    isPurchased={hasTokensLocked}
                   />
                 </div>
               </div>
@@ -271,9 +271,9 @@ export default function YieldPoolApp() {
               <Button
                 onClick={handleCreatePool}
                 className="w-full neon-button text-sm py-4"
-                disabled={!isPaid}
+                disabled={!hasTokensLocked}
               >
-                {!isPaid ? (
+                {!hasTokensLocked ? (
                   <><Lock className="w-4 h-4 mr-2" />Lock Tokens First</>
                 ) : (
                   <><Zap className="w-4 h-4 mr-2" />Create Yield Pool</>
@@ -359,6 +359,22 @@ export default function YieldPoolApp() {
             nftCount={42}
           />
         )}
+
+        {/* Footer with Total Burned */}
+        <div className="mt-6 pt-4 border-t border-gray-800/50">
+          <div className="bg-gradient-to-r from-orange-500/10 via-red-500/10 to-orange-500/10 border border-orange-500/20 rounded-lg p-3 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Flame className="w-5 h-5 text-orange-400" />
+              <h3 className="text-lg font-bold text-orange-400">Total Samish Burned</h3>
+            </div>
+            <div className="text-2xl font-black text-transparent bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text">
+              $127.50
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Deflationary tokenomics supporting @samish creator economy
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
