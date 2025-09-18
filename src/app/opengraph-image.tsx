@@ -26,7 +26,7 @@ export default async function Image() {
           overflow: "hidden",
         }}
       >
-        {/* Background gradient with Farcaster purple and electric blue */}
+        {/* Background gradient with NFT/finance themed colors - deep purple to teal */}
         <div
           style={{
             position: "absolute",
@@ -34,12 +34,12 @@ export default async function Image() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "linear-gradient(135deg, #8A63D2 0%, #1E90FF 100%)",
-            opacity: 0.9,
+            background: "linear-gradient(135deg, #4C1D95 0%, #0891B2 100%)",
+            opacity: 0.95,
           }}
         />
 
-        {/* Subtle pattern overlay for depth */}
+        {/* Geometric pattern overlay for financial/tech feel */}
         <div
           style={{
             position: "absolute",
@@ -48,7 +48,7 @@ export default async function Image() {
             right: 0,
             bottom: 0,
             backgroundImage:
-              "radial-gradient(circle at 20% 80%, rgba(138, 99, 210, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(30, 144, 255, 0.4) 0%, transparent 50%)",
+              "radial-gradient(circle at 25% 25%, rgba(14, 165, 233, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)",
           }}
         />
 
@@ -140,19 +140,98 @@ export default async function Image() {
           {/* Project description */}
           <p
             style={{
-              fontSize: "36px",
-              fontWeight: "600",
-              color: "rgba(255, 255, 255, 0.95)",
+              fontSize: "32px",
+              fontWeight: "500",
+              color: "rgba(255, 255, 255, 0.9)",
               textAlign: "center",
-              marginBottom: "56px",
-              lineHeight: 1.3,
+              marginBottom: "48px",
+              lineHeight: 1.4,
               textShadow: "0 3px 12px rgba(0, 0, 0, 0.4)",
-              maxWidth: "800px",
+              maxWidth: "900px",
               fontFamily: "system-ui, -apple-system, sans-serif",
             }}
           >
             {PROJECT_DESCRIPTION}
           </p>
+
+          {/* Feature highlights */}
+          <div
+            style={{
+              display: "flex",
+              gap: "24px",
+              marginBottom: "40px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              maxWidth: "800px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 24px",
+                backgroundColor: "rgba(14, 165, 233, 0.25)",
+                borderRadius: "50px",
+                border: "2px solid rgba(14, 165, 233, 0.4)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "22px",
+                  fontWeight: "600",
+                  color: "#ffffff",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                }}
+              >
+                Portfolio Tracking
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 24px",
+                backgroundColor: "rgba(139, 92, 246, 0.25)",
+                borderRadius: "50px",
+                border: "2px solid rgba(139, 92, 246, 0.4)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "22px",
+                  fontWeight: "600",
+                  color: "#ffffff",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                }}
+              >
+                Yield Optimization
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 24px",
+                backgroundColor: "rgba(6, 182, 212, 0.25)",
+                borderRadius: "50px",
+                border: "2px solid rgba(6, 182, 212, 0.4)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "22px",
+                  fontWeight: "600",
+                  color: "#ffffff",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                }}
+              >
+                Multi-Chain Support
+              </span>
+            </div>
+          </div>
 
           {/* Farcaster branding element */}
           <div
@@ -160,18 +239,18 @@ export default async function Image() {
               display: "flex",
               alignItems: "center",
               gap: "16px",
-              padding: "20px 40px",
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              padding: "16px 32px",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
               borderRadius: "100px",
-              border: "3px solid rgba(255, 255, 255, 0.4)",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
               backdropFilter: "blur(10px)",
               boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
             }}
           >
             {/* Farcaster icon */}
             <svg
-              width="32"
-              height="32"
+              width="28"
+              height="28"
               viewBox="0 0 256 256"
               fill="none"
               style={{
@@ -186,7 +265,7 @@ export default async function Image() {
             </svg>
             <span
               style={{
-                fontSize: "26px",
+                fontSize: "24px",
                 fontWeight: "700",
                 color: "#ffffff",
                 fontFamily: "system-ui, -apple-system, sans-serif",
