@@ -19,9 +19,7 @@ import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
 import LotteryDisplay from "~/components/lottery-display";
 import { useTokenBurnEscrow } from "~/hooks/useTokenBurnEscrow";
-import NFTYieldTokenMint from "~/components/nftyield-token-mint";
-import NFTYieldTokenDashboard from "~/components/nftyield-token-dashboard";
-import NFTYieldTokenDistribution from "~/components/nftyield-token-distribution";
+import NFTYieldTokenInfo from "~/components/nftyield-token-info";
 
 interface YieldPool {
   id: string;
@@ -519,50 +517,7 @@ export default function YieldPoolApp() {
         )}
 
         {activeTab === "token" && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setActiveTab("token")}
-                className="text-xs border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
-              >
-                Mint
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setActiveTab("token")}
-                className="text-xs border-purple-400/30 bg-purple-400/10 text-purple-300"
-              >
-                Portfolio
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setActiveTab("token")}
-                className="text-xs border-green-400/30 bg-green-400/10 text-green-300"
-              >
-                Distribution
-              </Button>
-            </div>
-
-            {/* Token Sub-tabs */}
-            <div className="space-y-4">
-              <NFTYieldTokenMint onMintComplete={(amount, tier) => {
-                toast({
-                  title: "NFTY Tokens Minted!",
-                  description: `Successfully minted ${amount} NFTY tokens at ${tier} tier`
-                });
-              }} />
-
-              <NFTYieldTokenDashboard onStake={(poolId, amount) => {
-                toast({
-                  title: "Tokens Staked",
-                  description: `${amount} NFTY tokens staked in pool ${poolId}`
-                });
-              }} />
-
-              <NFTYieldTokenDistribution />
-            </div>
-          </div>
+          <NFTYieldTokenInfo />
         )}
 
         {/* Footer with Total Burned */}
