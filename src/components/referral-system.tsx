@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -33,30 +33,54 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
 
   // Generate referral code based on user address or FID
   useEffect(() => {
+    // Check if we already have a saved referral code
+    const savedCode = localStorage.getItem('nftyield_referral_code');
+    if (savedCode) {
+      setReferralCode(savedCode);
+      return;
+    }
+
     if (sdk?.context?.user?.fid) {
       const code = `NFT-${sdk.context.user.fid.toString().padStart(6, '0')}`;
       setReferralCode(code);
-    } else {
-      // Fallback random code
+      localStorage.setItem('nftyield_referral_code', code);
+    } else if (sdk?.isSDKLoaded) {
+      // Fallback random code only after SDK is loaded to ensure consistency
       const randomCode = `NFT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       setReferralCode(randomCode);
+      localStorage.setItem('nftyield_referral_code', randomCode);
     }
-  }, [sdk?.context?.user]);
+  }, [sdk?.context?.user, sdk?.isSDKLoaded]);
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedReferrals = localStorage.getItem('nftyield_referrals');
-    const savedBonus = localStorage.getItem('nftyield_referral_bonus');
-    const savedNotifications = localStorage.getItem('nftyield_notifications');
+    try {
+      const savedReferrals = localStorage.getItem('nftyield_referrals');
+      const savedBonus = localStorage.getItem('nftyield_referral_bonus');
+      const savedNotifications = localStorage.getItem('nftyield_notifications');
 
-    if (savedReferrals) {
-      setReferrals(JSON.parse(savedReferrals));
-    }
-    if (savedBonus) {
-      setTotalBonus(parseFloat(savedBonus));
-    }
-    if (savedNotifications) {
-      setNotifications(JSON.parse(savedNotifications));
+      if (savedReferrals) {
+        const parsedReferrals = JSON.parse(savedReferrals).map((ref: any) => ({
+          ...ref,
+          createdAt: new Date(ref.createdAt)
+        }));
+        setReferrals(parsedReferrals);
+      }
+      if (savedBonus) {
+        const bonus = parseFloat(savedBonus);
+        if (!isNaN(bonus)) {
+          setTotalBonus(bonus);
+        }
+      }
+      if (savedNotifications) {
+        setNotifications(JSON.parse(savedNotifications));
+      }
+    } catch (error) {
+      console.warn('Failed to load referral data from localStorage:', error);
+      // Reset to defaults if data is corrupted
+      setReferrals([]);
+      setTotalBonus(0);
+      setNotifications([]);
     }
   }, []);
 
@@ -68,31 +92,90 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
     setTotalBonus(newBonus);
   };
 
-  const copyReferralLink = async () => {
+  const copyReferralLink = useCallback(async () => {
+    if (!referralCode) {
+      toast({
+        title: "Referral Code Not Ready",
+        description: "Please wait for your referral code to be generated",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const referralLink = `https://nftyield.app?ref=${referralCode}`;
 
     try {
-      await navigator.clipboard.writeText(referralLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        title: "Referral Link Copied",
-        description: "Share this link to earn referral bonuses"
-      });
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(referralLink);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        toast({
+          title: "Referral Link Copied",
+          description: "Share this link to earn referral bonuses"
+        });
+      } else {
+        // Fallback for non-secure contexts or older browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = referralLink;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand('copy');
+          textArea.remove();
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          toast({
+            title: "Referral Link Copied",
+            description: "Share this link to earn referral bonuses"
+          });
+        } catch (err) {
+          textArea.remove();
+          throw new Error("Copy command failed");
+        }
+      }
     } catch (error) {
+      console.error('Copy failed:', error);
       toast({
         title: "Copy Failed",
-        description: "Please copy the link manually",
+        description: `Manual copy: ${referralLink}`,
         variant: "destructive"
       });
     }
-  };
+  }, [referralCode, toast]);
 
   // Simulate referral registration (would be called when someone uses referral link)
-  const addReferral = (referredUser: string) => {
+  const addReferral = useCallback((referredUser: string) => {
+    if (!referredUser || referredUser.trim() === '') {
+      toast({
+        title: "Invalid Referral",
+        description: "Referred user address cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if referral already exists
+    const existingReferral = referrals.find(ref =>
+      ref.referredUser.toLowerCase() === referredUser.toLowerCase()
+    );
+
+    if (existingReferral) {
+      toast({
+        title: "Referral Already Exists",
+        description: "This user has already been referred",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const newReferral: Referral = {
       id: Date.now().toString(),
-      referredUser,
+      referredUser: referredUser.trim(),
       status: "pending",
       bonusEarned: 0,
       createdAt: new Date()
@@ -102,13 +185,38 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
     saveData(updatedReferrals, totalBonus);
 
     addNotification(`New referral: ${referredUser.slice(0, 8)}... registered`);
-  };
+
+    toast({
+      title: "Referral Added Successfully",
+      description: "You'll earn bonuses when they lock tokens"
+    });
+  }, [referrals, totalBonus, toast]);
 
   // Update referral status when they lock tokens
-  const updateReferralStatus = (referralId: string, newStatus: "locked" | "completed") => {
+  const updateReferralStatus = useCallback((referralId: string, newStatus: "locked" | "completed") => {
+    if (!referralId) {
+      toast({
+        title: "Invalid Referral ID",
+        description: "Cannot update referral status",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const referralToUpdate = referrals.find(ref => ref.id === referralId);
+    if (!referralToUpdate) {
+      toast({
+        title: "Referral Not Found",
+        description: "Unable to find the referral to update",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const updatedReferrals = referrals.map(ref => {
       if (ref.id === referralId) {
-        const bonus = newStatus === "locked" ? 2.5 : 5; // $2.50 on lock, $5 total on completion
+        // Progressive bonus: $2.50 on lock, additional $2.50 on completion (total $5)
+        const bonus = newStatus === "locked" ? 2.5 : newStatus === "completed" ? 5 : 0;
         return {
           ...ref,
           status: newStatus,
@@ -121,27 +229,36 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
     const newTotalBonus = updatedReferrals.reduce((sum, ref) => sum + ref.bonusEarned, 0);
     saveData(updatedReferrals, newTotalBonus);
 
-    const bonusAmount = newStatus === "locked" ? 2.5 : 5;
-    onReferralComplete(bonusAmount);
+    const bonusAmount = newStatus === "locked" ? 2.5 : newStatus === "completed" ? 2.5 : 0;
+    if (bonusAmount > 0) {
+      onReferralComplete(bonusAmount);
+      addNotification(`Earned $${bonusAmount} referral bonus!`);
 
-    addNotification(`Earned $${bonusAmount} referral bonus!`);
+      toast({
+        title: "Referral Bonus Earned!",
+        description: `You earned $${bonusAmount} from your referral`,
+      });
+    }
+  }, [referrals, toast, onReferralComplete]);
 
-    toast({
-      title: "Referral Bonus Earned!",
-      description: `You earned $${bonusAmount} from your referral`,
+  const addNotification = useCallback((message: string) => {
+    if (!message || message.trim() === '') return;
+
+    setNotifications(prev => {
+      const newNotifications = [message.trim(), ...prev].slice(0, 10); // Keep last 10
+      localStorage.setItem('nftyield_notifications', JSON.stringify(newNotifications));
+      return newNotifications;
     });
-  };
+  }, []);
 
-  const addNotification = (message: string) => {
-    const newNotifications = [message, ...notifications].slice(0, 10); // Keep last 10
-    setNotifications(newNotifications);
-    localStorage.setItem('nftyield_notifications', JSON.stringify(newNotifications));
-  };
-
-  const clearNotifications = () => {
+  const clearNotifications = useCallback(() => {
     setNotifications([]);
     localStorage.setItem('nftyield_notifications', JSON.stringify([]));
-  };
+    toast({
+      title: "Notifications Cleared",
+      description: "All notifications have been removed"
+    });
+  }, [toast]);
 
   const pendingReferrals = referrals.filter(r => r.status === "pending").length;
   const completedReferrals = referrals.filter(r => r.status === "completed").length;
@@ -181,12 +298,14 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
             <Label className="text-cyan-400 font-medium text-sm">Your Referral Code</Label>
             <div className="flex gap-2">
               <Input
-                value={referralCode}
+                value={referralCode || "Generating..."}
                 readOnly
                 className="neon-input text-sm font-mono"
+                placeholder="Loading referral code..."
               />
               <Button
                 onClick={copyReferralLink}
+                disabled={!referralCode}
                 className={`px-3 ${copied ? "neon-button-success" : "neon-button"}`}
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -306,10 +425,15 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
             </Button>
             {pendingReferrals > 0 && (
               <Button
-                onClick={() => updateReferralStatus(referrals.find(r => r.status === "pending")?.id || "", "locked")}
+                onClick={() => {
+                  const pendingRef = referrals.find(r => r.status === "pending");
+                  if (pendingRef) {
+                    updateReferralStatus(pendingRef.id, "locked");
+                  }
+                }}
                 className="text-xs bg-yellow-600 hover:bg-yellow-700"
               >
-                Lock Tokens
+                Lock Tokens ({pendingReferrals})
               </Button>
             )}
           </div>
