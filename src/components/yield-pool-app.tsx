@@ -14,9 +14,10 @@ import ViralShare from "~/components/viral-share";
 import ReferralSystem from "~/components/referral-system";
 import CustomYieldPools from "~/components/custom-yield-pools";
 import ActivePoolChat from "~/components/active-pool-chat";
-import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench } from "lucide-react";
+import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench, Trophy } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
+import LotteryDisplay from "~/components/lottery-display";
 import { useTokenBurnEscrow } from "~/hooks/useTokenBurnEscrow";
 
 interface YieldPool {
@@ -31,7 +32,7 @@ interface YieldPool {
 }
 
 export default function YieldPoolApp() {
-  const [activeTab, setActiveTab] = useState<"create" | "manage" | "custom" | "referrals" | "community" | "admin" | "share">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "manage" | "custom" | "referrals" | "community" | "lottery" | "admin" | "share">("create");
   const [pools, setPools] = useState<YieldPool[]>([]);
   const [customPools, setCustomPools] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -172,7 +173,7 @@ export default function YieldPoolApp() {
     setLockedPoolId(poolId);
     toast({
       title: "Tokens Locked Successfully",
-      description: "$5 burned, $5 refundable. You can now create your yield pool."
+      description: "$5 burned, $5 entered lottery system. You can now create your yield pool."
     });
   };
 
@@ -216,63 +217,75 @@ export default function YieldPoolApp() {
         </div>
 
         {/* Tab Navigation - Mobile Optimized */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
-          <Button
-            variant={activeTab === "create" ? "default" : "ghost"}
-            onClick={() => setActiveTab("create")}
-            className={`${activeTab === "create" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Zap className="w-3 h-3 mr-1" />
-            Create
-          </Button>
-          <Button
-            variant={activeTab === "manage" ? "default" : "ghost"}
-            onClick={() => setActiveTab("manage")}
-            className={`${activeTab === "manage" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <TrendingUp className="w-3 h-3 mr-1" />
-            Pools
-          </Button>
-          <Button
-            variant={activeTab === "custom" ? "default" : "ghost"}
-            onClick={() => setActiveTab("custom")}
-            className={`${activeTab === "custom" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Wrench className="w-3 h-3 mr-1" />
-            Custom
-          </Button>
-          <Button
-            variant={activeTab === "referrals" ? "default" : "ghost"}
-            onClick={() => setActiveTab("referrals")}
-            className={`${activeTab === "referrals" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Gift className="w-3 h-3 mr-1" />
-            Referrals
-          </Button>
-          <Button
-            variant={activeTab === "community" ? "default" : "ghost"}
-            onClick={() => setActiveTab("community")}
-            className={`${activeTab === "community" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <MessageSquare className="w-3 h-3 mr-1" />
-            Chat
-          </Button>
-          <Button
-            variant={activeTab === "share" ? "default" : "ghost"}
-            onClick={() => setActiveTab("share")}
-            className={`${activeTab === "share" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Share2 className="w-3 h-3 mr-1" />
-            Share
-          </Button>
-          <Button
-            variant={activeTab === "admin" ? "default" : "ghost"}
-            onClick={() => setActiveTab("admin")}
-            className={`${activeTab === "admin" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Settings className="w-3 h-3 mr-1" />
-            Admin
-          </Button>
+        <div className="space-y-2">
+          <div className="grid grid-cols-4 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
+            <Button
+              variant={activeTab === "create" ? "default" : "ghost"}
+              onClick={() => setActiveTab("create")}
+              className={`${activeTab === "create" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Zap className="w-3 h-3 mr-1" />
+              Create
+            </Button>
+            <Button
+              variant={activeTab === "manage" ? "default" : "ghost"}
+              onClick={() => setActiveTab("manage")}
+              className={`${activeTab === "manage" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <TrendingUp className="w-3 h-3 mr-1" />
+              Pools
+            </Button>
+            <Button
+              variant={activeTab === "lottery" ? "default" : "ghost"}
+              onClick={() => setActiveTab("lottery")}
+              className={`${activeTab === "lottery" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Trophy className="w-3 h-3 mr-1" />
+              Lottery
+            </Button>
+            <Button
+              variant={activeTab === "referrals" ? "default" : "ghost"}
+              onClick={() => setActiveTab("referrals")}
+              className={`${activeTab === "referrals" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Gift className="w-3 h-3 mr-1" />
+              Referrals
+            </Button>
+          </div>
+          <div className="grid grid-cols-4 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
+            <Button
+              variant={activeTab === "custom" ? "default" : "ghost"}
+              onClick={() => setActiveTab("custom")}
+              className={`${activeTab === "custom" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Wrench className="w-3 h-3 mr-1" />
+              Custom
+            </Button>
+            <Button
+              variant={activeTab === "community" ? "default" : "ghost"}
+              onClick={() => setActiveTab("community")}
+              className={`${activeTab === "community" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <MessageSquare className="w-3 h-3 mr-1" />
+              Chat
+            </Button>
+            <Button
+              variant={activeTab === "share" ? "default" : "ghost"}
+              onClick={() => setActiveTab("share")}
+              className={`${activeTab === "share" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Share2 className="w-3 h-3 mr-1" />
+              Share
+            </Button>
+            <Button
+              variant={activeTab === "admin" ? "default" : "ghost"}
+              onClick={() => setActiveTab("admin")}
+              className={`${activeTab === "admin" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Settings className="w-3 h-3 mr-1" />
+              Admin
+            </Button>
+          </div>
         </div>
 
         {activeTab === "create" && (
@@ -295,7 +308,7 @@ export default function YieldPoolApp() {
                     <div>
                       <p className="font-medium text-white text-sm">$10 Worth Lock Required</p>
                       <p className="text-xs text-gray-400">
-                        $5 burned + $5 returned after pool ends
+                        $5 burned + $5 enters lottery system for rewards
                       </p>
                     </div>
                     <Flame className="w-5 h-5 text-orange-400" />
@@ -468,6 +481,10 @@ export default function YieldPoolApp() {
 
         {activeTab === "custom" && (
           <CustomYieldPools onPoolCreate={handleCustomPoolCreate} />
+        )}
+
+        {activeTab === "lottery" && (
+          <LotteryDisplay userPools={[...pools, ...customPools]} totalBurned={totalBurned} />
         )}
 
         {activeTab === "referrals" && (

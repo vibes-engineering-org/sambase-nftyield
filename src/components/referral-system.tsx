@@ -55,6 +55,10 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
   // Load saved data from localStorage
   useEffect(() => {
     try {
+      // Ensure we're in browser environment
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       const savedReferrals = localStorage.getItem('nftyield_referrals');
       const savedBonus = localStorage.getItem('nftyield_referral_bonus');
       const savedNotifications = localStorage.getItem('nftyield_notifications');
@@ -86,10 +90,18 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
 
   // Save data to localStorage
   const saveData = (newReferrals: Referral[], newBonus: number) => {
-    localStorage.setItem('nftyield_referrals', JSON.stringify(newReferrals));
-    localStorage.setItem('nftyield_referral_bonus', newBonus.toString());
-    setReferrals(newReferrals);
-    setTotalBonus(newBonus);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('nftyield_referrals', JSON.stringify(newReferrals));
+        localStorage.setItem('nftyield_referral_bonus', newBonus.toString());
+      }
+      setReferrals(newReferrals);
+      setTotalBonus(newBonus);
+    } catch (error) {
+      console.warn('Failed to save referral data:', error);
+      setReferrals(newReferrals);
+      setTotalBonus(newBonus);
+    }
   };
 
   const copyReferralLink = useCallback(async () => {
@@ -246,7 +258,13 @@ export default function ReferralSystem({ onReferralComplete }: ReferralSystemPro
 
     setNotifications(prev => {
       const newNotifications = [message.trim(), ...prev].slice(0, 10); // Keep last 10
-      localStorage.setItem('nftyield_notifications', JSON.stringify(newNotifications));
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('nftyield_notifications', JSON.stringify(newNotifications));
+        }
+      } catch (error) {
+        console.warn('Failed to save notifications:', error);
+      }
       return newNotifications;
     });
   }, []);

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Shield, Flame, TrendingUp, Users, DollarSign, BarChart3, Activity } from "lucide-react";
+import { Shield, Flame, TrendingUp, Users, DollarSign, BarChart3, Activity, Trophy, Gift } from "lucide-react";
 
 interface AdminSectionProps {
   pools?: any[];
@@ -12,7 +12,9 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
   const totalUsers = 147 + pools.length; // Base users + pool creators
   const activePools = pools.filter(p => p.status === 'active').length;
   const totalVolume = (parseFloat(totalBurned) * 2 * 0.05) + 2340; // Burned * 2 (since 50% is burned) * price + base volume
-  const pendingRefunds = pools.length * 5; // $5 per pool in escrow
+  const lotteryPool = pools.length * 5; // $5 per pool in lottery system
+  const monthlyLotteryPot = pools.length * 2.5; // $2.50 per pool for monthly lottery
+  const completedPools = pools.filter(p => p.status === 'completed').length;
 
   return (
     <div className="space-y-4">
@@ -23,7 +25,7 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
           </div>
           <CardTitle className="neon-text text-lg">Admin Analytics</CardTitle>
           <CardDescription className="text-gray-300 text-sm">
-            Detailed platform statistics and user interaction data
+            Platform analytics with automated lottery rewards system
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -40,14 +42,36 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
               <div className="text-xs text-gray-400">Active Pools</div>
             </div>
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 text-center">
-              <DollarSign className="w-6 h-6 text-purple-400 mx-auto mb-1" />
-              <div className="text-lg font-bold text-purple-400">${pendingRefunds.toFixed(2)}</div>
-              <div className="text-xs text-gray-400">Pending Refunds</div>
+              <Trophy className="w-6 h-6 text-purple-400 mx-auto mb-1" />
+              <div className="text-lg font-bold text-purple-400">${lotteryPool.toFixed(2)}</div>
+              <div className="text-xs text-gray-400">Lottery Pool</div>
             </div>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-center">
               <BarChart3 className="w-6 h-6 text-yellow-400 mx-auto mb-1" />
               <div className="text-lg font-bold text-yellow-400">${totalVolume.toFixed(0)}</div>
               <div className="text-xs text-gray-400">Total Volume</div>
+            </div>
+          </div>
+
+          {/* Lottery System Stats */}
+          <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Gift className="w-4 h-4 text-pink-400" />
+              <span className="text-sm font-medium text-pink-400">Automated Lottery System</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="text-center">
+                <div className="text-lg font-bold text-yellow-400">${monthlyLotteryPot.toFixed(2)}</div>
+                <div className="text-gray-400">Monthly Pot</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-400">{completedPools}</div>
+                <div className="text-gray-400">Eligible Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-purple-400">12</div>
+                <div className="text-gray-400">Days Until Draw</div>
+              </div>
             </div>
           </div>
 
@@ -97,12 +121,14 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
           </div>
 
           <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-            <h4 className="text-purple-400 font-medium text-sm mb-2">Platform Notes</h4>
+            <h4 className="text-purple-400 font-medium text-sm mb-2">New Lottery System</h4>
             <ul className="text-xs text-gray-400 space-y-1">
-              <li>• Users must lock $10 Samish Creator tokens to create pools</li>
+              <li>• Users lock $10 Samish Creator tokens to create pools</li>
               <li>• $5 automatically burned per pool (deflationary mechanism)</li>
-              <li>• $5 refunded when pool duration ends</li>
-              <li>• All transactions occur on Base network</li>
+              <li>• $5 enters automated lottery: $2.50 immediate + $2.50 monthly pot</li>
+              <li>• Random winners selected from eligible users who completed full cycle</li>
+              <li>• Monthly lottery distributes accumulated pot to one lucky winner</li>
+              <li>• Fully automated smart contract - no admin intervention needed</li>
             </ul>
           </div>
         </CardContent>
