@@ -67,15 +67,47 @@ export default function NFTYieldTokenMint({ onMintComplete }: NFTYieldTokenMintP
   const [isProcessing, setIsProcessing] = useState(false);
   const [tokenMetrics, setTokenMetrics] = useState<TokenMetrics>({
     totalSupply: NFTYIELD_TOKEN_CONFIG.totalSupply,
-    circulatingSupply: "5000000", // 5M circulating
-    totalBurned: "500000", // 500K burned
-    totalStaked: "2000000", // 2M staked
-    holders: 1247,
-    marketCap: "50000", // $50K
+    circulatingSupply: "0", // No tokens circulating yet
+    totalBurned: "0", // No tokens burned yet
+    totalStaked: "0", // No tokens staked yet
+    holders: 0, // No holders yet
+    marketCap: "0", // No market cap yet
     price: NFTYIELD_TOKEN_CONFIG.mintPrice
   });
 
   const { toast } = useToast();
+
+  // Load initial metrics from localStorage
+  useEffect(() => {
+    const loadMetrics = () => {
+      const userTokens = JSON.parse(localStorage.getItem('nftyield_user_tokens') || '[]');
+      const uniqueHolders = new Set();
+      let totalCirculating = 0;
+      let totalStaked = 0;
+
+      userTokens.forEach((token: any) => {
+        uniqueHolders.add(token.id || Date.now().toString()); // Use unique identifier for each mint
+        totalCirculating += parseFloat(token.amount || '0');
+        // Assume 50% of tokens are staked after lock period ends
+        if (new Date() > new Date(token.lockEndDate || 0)) {
+          totalStaked += parseFloat(token.amount || '0') * 0.5;
+        }
+      });
+
+      // Calculate market cap based on circulating supply
+      const marketCap = totalCirculating * parseFloat(NFTYIELD_TOKEN_CONFIG.mintPrice);
+
+      setTokenMetrics(prev => ({
+        ...prev,
+        circulatingSupply: totalCirculating.toString(),
+        totalStaked: totalStaked.toString(),
+        holders: uniqueHolders.size,
+        marketCap: marketCap.toFixed(2)
+      }));
+    };
+
+    loadMetrics();
+  }, []);
 
   useEffect(() => {
     const amount = parseFloat(mintAmount) || 0;
@@ -118,11 +150,14 @@ export default function NFTYieldTokenMint({ onMintComplete }: NFTYieldTokenMintP
       localStorage.setItem('nftyield_user_tokens', JSON.stringify(userTokens));
 
       // Update metrics
-      const newCirculating = (parseFloat(tokenMetrics.circulatingSupply) + parseFloat(mintAmount)).toString();
+      const newCirculating = parseFloat(tokenMetrics.circulatingSupply) + parseFloat(mintAmount);
+      const newMarketCap = newCirculating * parseFloat(NFTYIELD_TOKEN_CONFIG.mintPrice);
+
       setTokenMetrics(prev => ({
         ...prev,
-        circulatingSupply: newCirculating,
-        holders: prev.holders + 1
+        circulatingSupply: newCirculating.toString(),
+        holders: prev.holders + 1,
+        marketCap: newMarketCap.toFixed(2)
       }));
 
       toast({
