@@ -6,14 +6,7 @@ export async function GET() {
     `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
 
   const config = {
-    accountAssociation: {
-      header:
-        "eyJmaWQiOjEzNTk2LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4ODE3MzE4RDZmRkY2NkExOGQ4M0ExMzc2QTc2RjZlMzBCNDNjODg4OSJ9",
-      payload:
-        "eyJkb21haW4iOiJmYXJjYXN0ZXItbWluaWFwcC10ZW1wbGF0ZS52ZXJjZWwuYXBwIn0",
-      signature:
-        "MHg5ZjkyZTdkNjRmZTNhNTE4YTEzOTBmZTdlYzAwOWQzODUzZWM2N2RmOTZiYjg1MzAwOGRlZDExNjVmOGE5OGVlNDQyYmI0MDU3OTI0ZmEzOGE3N2NlYWRiYThiMTRiN2IzMTY5N2ZjYWVlZGM3MTE1YWNiMTFmYjc2Y2EzYTc0YzFj",
-    },
+    accountAssociation: "{\"accountAssociation\":{\"header\":\"eyJmaWQiOjEzMjg2MjcsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhhOTY0MjcyMzA5MzQ3Y0EyRjIxNTNBZTI1Y0ZjMUNkQTBCODM3NTdGIn0\",\"payload\":\"eyJkb21haW4iOiJzYW1iYXNlLW5mdHlpZWxkLnZlcmNlbC5hcHAifQ\",\"signature\":\"bMJ3h9p4wPnW6U/6DdEPabONaxsOnnakISTcfB5VG88Zcb0H5osDnZP3GdniMsj8RWQDoHeAnzaE3C1e3yPMBRw=\"},\"miniapp\":{\"version\":\"1\",\"name\":\"NFTYield\",\"iconUrl\":\"https://sambase-nftyield.vercel.app/icon.png\",\"homeUrl\":\"https://sambase-nftyield.vercel.app\"}}",
     miniapp: {
       version: "1",
       name: PROJECT_TITLE,
