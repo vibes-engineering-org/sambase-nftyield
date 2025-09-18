@@ -9,9 +9,9 @@ interface AdminSectionProps {
 }
 
 export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSectionProps) {
-  const totalUsers = 147 + pools.length; // Base users + pool creators
+  const totalUsers = pools.length; // Actual pool creators only
   const activePools = pools.filter(p => p.status === 'active').length;
-  const totalVolume = (parseFloat(totalBurned) * 2 * 0.05) + 2340; // Burned * 2 (since 50% is burned) * price + base volume
+  const totalVolume = parseFloat(totalBurned) * 2 * 0.05; // Burned * 2 (since 50% is burned) * price only
   const lotteryPool = pools.length * 5; // $5 per pool in lottery system
   const monthlyLotteryPot = pools.length * 2.5; // $2.50 per pool for monthly lottery
   const completedPools = pools.filter(p => p.status === 'completed').length;
@@ -69,7 +69,7 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
                 <div className="text-gray-400">Eligible Users</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-purple-400">12</div>
+                <div className="text-lg font-bold text-purple-400">30</div>
                 <div className="text-gray-400">Days Until Draw</div>
               </div>
             </div>
@@ -85,15 +85,15 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Daily Active Users:</span>
-                  <span className="text-white">89</span>
+                  <span className="text-white">{totalUsers}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Avg Session Time:</span>
-                  <span className="text-white">4.2 min</span>
+                  <span className="text-gray-400">Active Pools:</span>
+                  <span className="text-white">{activePools}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Pool Creation Rate:</span>
-                  <span className="text-white">73%</span>
+                  <span className="text-gray-400">Pool Completion Rate:</span>
+                  <span className="text-white">{totalUsers > 0 ? Math.round((completedPools / totalUsers) * 100) : 0}%</span>
                 </div>
               </div>
             </div>
@@ -105,16 +105,16 @@ export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSec
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Total Burns This Week:</span>
-                  <span className="text-orange-400">$67.50</span>
+                  <span className="text-gray-400">Total Burned:</span>
+                  <span className="text-orange-400">${(parseFloat(totalBurned) * 0.05).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Burn Rate Trend:</span>
-                  <span className="text-green-400">+15.3%</span>
+                  <span className="text-gray-400">Tokens Burned:</span>
+                  <span className="text-orange-400">{totalBurned}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Avg Burn Per User:</span>
-                  <span className="text-white">$5.00</span>
+                  <span className="text-white">{totalUsers > 0 ? (parseFloat(totalBurned) / totalUsers).toFixed(0) : 0} tokens</span>
                 </div>
               </div>
             </div>

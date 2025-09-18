@@ -32,30 +32,26 @@ export default function LotteryDisplay({ userPools, totalBurned }: LotteryDispla
   });
   const { toast } = useToast();
 
-  // Mock lottery data - in real implementation, this would come from smart contract
+  // Real lottery data from actual user pools
   useEffect(() => {
     const completedPools = userPools.filter(p => p.status === 'completed').length;
     const totalPools = userPools.length;
     const monthlyPot = totalPools * 2.5; // $2.50 per pool for monthly lottery
 
-    // Calculate next lottery time (every 30 days)
+    // Calculate next lottery time (every 30 days from app start)
     const nextLottery = new Date();
-    nextLottery.setDate(nextLottery.getDate() + 18); // Mock: 18 days until next
+    nextLottery.setDate(nextLottery.getDate() + 30);
 
-    // Mock recent winners
-    const mockWinners = [
-      { address: "0x1234...5678", amount: 15.5, date: new Date(Date.now() - 86400000 * 2) },
-      { address: "0xabcd...efgh", amount: 12.25, date: new Date(Date.now() - 86400000 * 5) },
-      { address: "0x9876...5432", amount: 8.75, date: new Date(Date.now() - 86400000 * 12) }
-    ];
+    // Real winners would come from smart contract - empty for now
+    const winners: { address: string; amount: number; date: Date }[] = [];
 
     setLotteryStats({
-      totalEntries: totalPools + 47, // Base entries + user pools
+      totalEntries: totalPools, // Actual entries only
       currentPool: monthlyPot,
       nextLotteryTime: nextLottery,
-      eligibleUsers: completedPools + 23, // Base eligible + user completed
+      eligibleUsers: completedPools, // Actual eligible users only
       userEligible: completedPools > 0,
-      recentWinners: mockWinners
+      recentWinners: winners
     });
   }, [userPools]);
 

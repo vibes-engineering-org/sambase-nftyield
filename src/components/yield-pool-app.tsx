@@ -502,8 +502,8 @@ export default function YieldPoolApp() {
         {activeTab === "share" && (
           <ViralShare
             pools={pools}
-            totalEarned="1,250"
-            nftCount={42}
+            totalEarned="0"
+            nftCount={0}
           />
         )}
 
