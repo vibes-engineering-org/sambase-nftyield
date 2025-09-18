@@ -28,25 +28,27 @@ export default function ViralShare({ pools, totalEarned = "0", nftCount = 0 }: V
     const poolCount = pools.length;
     const maxReward = Math.max(...pools.map(p => p.rewardPercentage), 0);
 
-    return `Just earned ${totalEarned} tokens from my ${nftCount} NFTs in NFTYield pools! 🚀
+    return `Just earned ${totalEarned} tokens from my ${nftCount} NFTs using NFTYield!
 
-💎 Managing ${poolCount} active yield pools
+💎 ${poolCount} active yield pools earning passive income
 ⚡ Up to ${maxReward}% rewards per NFT
-🔥 Passive income from my NFT collection
+🔥 Powered by $SAMISH Creator token on @zora
+💰 Deflationary mechanics: $5 burned, $5 refundable
 
-Join the NFTYield revolution and turn your NFTs into income!
-#NFTYield #PassiveIncome #Web3 #DeFi`;
+Turn your NFTs into yield machines!
+#NFTYield #SAMISH #Base #Zora #CreatorEconomy`;
   };
 
   const generateMilestoneText = () => {
     if (pools.length >= 5) {
-      return `🎉 Milestone achieved! I just created my ${pools.length}th NFTYield pool!
+      return `🎉 Power User Milestone! I just created my ${pools.length}th NFTYield pool!
 
-Power user status unlocked! 💪
-Earning passive income from multiple NFT collections with NFTYield.
+💪 Managing multiple NFT yield streams
+🔥 All powered by $SAMISH Creator tokens
+💰 Supporting @samish on @zora while earning yield
 
-Ready to maximize your NFT potential? Join me! 🚀
-#NFTYield #PowerUser #Web3`;
+The deflationary tokenomics are working! Ready to join? 🚀
+#NFTYield #SAMISH #PowerUser #CreatorEconomy`;
     }
 
     return generateShareText();
@@ -106,48 +108,48 @@ Ready to maximize your NFT potential? Join me! 🚀
 
   return (
     <Card className="neon-card border-purple-500/20">
-      <CardHeader className="text-center">
-        <div className="mx-auto w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
-          <Share2 className="w-6 h-6 text-white" />
+      <CardHeader className="text-center pb-3">
+        <div className="mx-auto w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-2">
+          <Share2 className="w-5 h-5 text-white" />
         </div>
-        <CardTitle className="neon-text text-xl">Share Your Success</CardTitle>
-        <CardDescription className="text-gray-300">
-          Show the world how you're earning with NFTYield
+        <CardTitle className="neon-text text-lg">Share Your Success</CardTitle>
+        <CardDescription className="text-gray-300 text-sm">
+          Show the world how NFTYield works
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Stats Overview */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-cyan-400">{pools.length}</div>
-            <div className="text-xs text-gray-400">Active Pools</div>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-cyan-400">{pools.length}</div>
+            <div className="text-xs text-gray-400">Pools</div>
           </div>
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-purple-400">{nftCount}</div>
-            <div className="text-xs text-gray-400">NFTs Earning</div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-purple-400">{nftCount}</div>
+            <div className="text-xs text-gray-400">NFTs</div>
           </div>
-          <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-pink-400">{totalEarned}</div>
-            <div className="text-xs text-gray-400">Tokens Earned</div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-pink-400">{totalEarned}</div>
+            <div className="text-xs text-gray-400">Earned</div>
           </div>
         </div>
 
         {/* Achievements */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-300">Your Achievements</h4>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-300">Achievements</h4>
+          <div className="flex flex-wrap gap-1">
             {achievements.map((achievement) => {
               const Icon = achievement.icon;
               return (
                 <Badge
                   key={achievement.label}
                   variant={achievement.condition ? "default" : "secondary"}
-                  className={achievement.condition
+                  className={`text-xs ${achievement.condition
                     ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white"
                     : "bg-gray-700 text-gray-400"
-                  }
+                  }`}
                 >
-                  <Icon className="w-3 h-3 mr-1" />
+                  <Icon className="w-2 h-2 mr-1" />
                   {achievement.label}
                 </Badge>
               );
@@ -156,75 +158,55 @@ Ready to maximize your NFT potential? Join me! 🚀
         </div>
 
         {/* Share Preview */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-gray-300 mb-2">Share Preview</h4>
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">Preview</h4>
           <p className="text-xs text-gray-400 whitespace-pre-line">
             {generateShareText()}
           </p>
         </div>
 
-        {/* Share Buttons */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-300">Share on Social Media</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={() => handleShare("twitter")}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              disabled={pools.length === 0}
-            >
-              Share on Twitter
-            </Button>
-            <Button
-              onClick={() => handleShare("facebook")}
-              className="bg-blue-700 hover:bg-blue-800 text-white"
-              disabled={pools.length === 0}
-            >
-              Share on Facebook
-            </Button>
-            <Button
-              onClick={() => handleShare("linkedin")}
-              className="bg-blue-800 hover:bg-blue-900 text-white"
-              disabled={pools.length === 0}
-            >
-              Share on LinkedIn
-            </Button>
-            <Button
-              onClick={copyToClipboard}
-              variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
-              disabled={pools.length === 0}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Text
-            </Button>
-          </div>
-        </div>
+        {/* Primary Farcaster Share */}
+        <ShareCastButton
+          text={generateShareText()}
+          className="w-full neon-button text-sm py-3"
+          variant="default"
+        />
 
-        {/* Farcaster Share */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-300">Share on Farcaster</h4>
-          <ShareCastButton
-            text={generateShareText()}
-            className="w-full neon-button"
-            variant="default"
-          />
+        {/* Secondary Social Share */}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            onClick={() => handleShare("twitter")}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs py-2"
+            disabled={pools.length === 0}
+          >
+            Twitter
+          </Button>
+          <Button
+            onClick={copyToClipboard}
+            variant="outline"
+            className="border-gray-600 text-gray-300 hover:bg-gray-700 text-xs py-2"
+            disabled={pools.length === 0}
+          >
+            <Copy className="w-3 h-3 mr-1" />
+            Copy
+          </Button>
         </div>
 
         {/* Share Stats */}
         {shareStats.shares > 0 && (
-          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-            <p className="text-green-400 text-sm font-medium">
-              🎉 You've shared {shareStats.shares} time{shareStats.shares !== 1 ? 's' : ''}!
+          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2 text-center">
+            <p className="text-green-400 text-xs font-medium">
+              Shared {shareStats.shares} time{shareStats.shares !== 1 ? 's' : ''}!
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              Keep sharing to grow the NFTYield community!
+              Growing the NFTYield community
             </p>
           </div>
         )}
 
         {pools.length === 0 && (
-          <div className="text-center text-sm text-gray-500 py-4">
-            Create your first yield pool to unlock sharing features
+          <div className="text-center text-xs text-gray-500 py-3">
+            Create your first pool to unlock sharing
           </div>
         )}
       </CardContent>
