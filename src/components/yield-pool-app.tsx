@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -17,6 +17,7 @@ import CommunityForum from "~/components/community-forum";
 import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
+import { useTokenBurnEscrow } from "~/hooks/useTokenBurnEscrow";
 
 interface YieldPool {
   id: string;
@@ -41,8 +42,69 @@ export default function YieldPoolApp() {
     contributionAmount: ""
   });
   const [hasTokensLocked, setHasTokensLocked] = useState(false);
+  const [lockedPoolId, setLockedPoolId] = useState<string | null>(null);
   const [referralBonus, setReferralBonus] = useState(0);
   const { toast } = useToast();
+
+  // Hook for real burned amount data
+  const { totalBurned } = useTokenBurnEscrow();
+
+  // Load pools from localStorage on mount
+  useEffect(() => {
+    const savedPools = localStorage.getItem('nftyield_pools');
+    const savedCustomPools = localStorage.getItem('nftyield_custom_pools');
+    const savedTokenLock = localStorage.getItem('nftyield_token_lock');
+
+    if (savedPools) {
+      try {
+        const parsed = JSON.parse(savedPools);
+        setPools(parsed.map((pool: any) => ({
+          ...pool,
+          createdAt: new Date(pool.createdAt)
+        })));
+      } catch (e) {
+        console.warn('Failed to parse saved pools:', e);
+      }
+    }
+
+    if (savedCustomPools) {
+      try {
+        setCustomPools(JSON.parse(savedCustomPools));
+      } catch (e) {
+        console.warn('Failed to parse saved custom pools:', e);
+      }
+    }
+
+    if (savedTokenLock) {
+      try {
+        const lockData = JSON.parse(savedTokenLock);
+        setHasTokensLocked(lockData.hasTokensLocked);
+        setLockedPoolId(lockData.poolId);
+      } catch (e) {
+        console.warn('Failed to parse token lock data:', e);
+      }
+    }
+  }, []);
+
+  // Save pools to localStorage whenever they change
+  useEffect(() => {
+    if (pools.length > 0) {
+      localStorage.setItem('nftyield_pools', JSON.stringify(pools));
+    }
+  }, [pools]);
+
+  useEffect(() => {
+    if (customPools.length > 0) {
+      localStorage.setItem('nftyield_custom_pools', JSON.stringify(customPools));
+    }
+  }, [customPools]);
+
+  useEffect(() => {
+    localStorage.setItem('nftyield_token_lock', JSON.stringify({
+      hasTokensLocked,
+      poolId: lockedPoolId
+    }));
+  }, [hasTokensLocked, lockedPoolId]);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
@@ -52,7 +114,7 @@ export default function YieldPoolApp() {
   };
 
   const handleCreatePool = () => {
-    if (!hasTokensLocked) {
+    if (!hasTokensLocked || !lockedPoolId) {
       toast({
         title: "Samish Tokens Required",
         description: "Please purchase and lock $10 worth of Samish Creator tokens first.",
@@ -71,7 +133,7 @@ export default function YieldPoolApp() {
     }
 
     const newPool: YieldPool = {
-      id: Date.now().toString(),
+      id: lockedPoolId, // Use the locked pool ID from token purchase
       nftCollection: formData.nftCollection,
       tokenAddress: formData.tokenAddress,
       duration: formData.duration,
@@ -81,7 +143,16 @@ export default function YieldPoolApp() {
       createdAt: new Date()
     };
 
-    setPools(prev => [...prev, newPool]);
+    setPools(prev => {
+      // Prevent duplicate pools
+      const existing = prev.find(p => p.id === lockedPoolId);
+      if (existing) {
+        return prev.map(p => p.id === lockedPoolId ? newPool : p);
+      }
+      return [...prev, newPool];
+    });
+
+    // Clear form but keep token lock until pool completes
     setFormData({
       nftCollection: "",
       tokenAddress: "",
@@ -89,7 +160,6 @@ export default function YieldPoolApp() {
       rewardPercentage: 10,
       contributionAmount: ""
     });
-    setHasTokensLocked(false);
 
     toast({
       title: "Pool Created Successfully",
@@ -97,8 +167,9 @@ export default function YieldPoolApp() {
     });
   };
 
-  const handleTokenLockComplete = () => {
+  const handleTokenLockComplete = (poolId: string) => {
     setHasTokensLocked(true);
+    setLockedPoolId(poolId);
     toast({
       title: "Tokens Locked Successfully",
       description: "$5 burned, $5 refundable. You can now create your yield pool."
@@ -236,6 +307,8 @@ export default function YieldPoolApp() {
                   <SamishTokenPurchase
                     onPurchaseComplete={handleTokenLockComplete}
                     isPurchased={hasTokensLocked}
+                    poolId={lockedPoolId || undefined}
+                    poolDuration={formData.duration}
                   />
                 </div>
               </div>
@@ -406,7 +479,7 @@ export default function YieldPoolApp() {
         )}
 
         {activeTab === "admin" && (
-          <AdminSection />
+          <AdminSection pools={pools} totalBurned={totalBurned} />
         )}
 
         {activeTab === "share" && (
@@ -425,7 +498,7 @@ export default function YieldPoolApp() {
               <h3 className="text-lg font-bold text-orange-400">Total Samish Burned</h3>
             </div>
             <div className="text-2xl font-black text-transparent bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text">
-              $127.50
+              ${(parseFloat(totalBurned) * 0.05).toFixed(2)}
             </div>
             <p className="text-xs text-gray-400 mt-1">
               Deflationary tokenomics supporting @samish creator economy

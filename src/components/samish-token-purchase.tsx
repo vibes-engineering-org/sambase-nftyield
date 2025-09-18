@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/hooks/use-toast";
+import { useTokenBurnEscrow } from "~/hooks/useTokenBurnEscrow";
 import { DaimoPayTransferButton } from "~/components/daimo-pay-transfer-button";
-import { ExternalLink, DollarSign, Flame, ArrowLeft, Check, Coins, Zap, Lock, Repeat } from "lucide-react";
+import { ExternalLink, DollarSign, Flame, ArrowLeft, Check, Coins, Zap, Lock, Repeat, AlertTriangle } from "lucide-react";
 import { formatUnits, parseUnits } from "viem";
 import { base } from "wagmi/chains";
 
 interface SamishTokenPurchaseProps {
-  onPurchaseComplete: () => void;
+  onPurchaseComplete: (poolId: string) => void;
   isPurchased: boolean;
+  poolId?: string;
+  poolDuration?: number;
 }
 
 const SAMISH_TOKEN_ADDRESS = "0x086bb3d90d719eb50d569e071b9987080ecb9781" as const;
@@ -24,12 +27,30 @@ const SAMISH_TOKEN_PRICE_USD = 0.05; // $0.05 per token
 const TARGET_USD_VALUE = 10; // $10 worth
 const TOKENS_TO_PURCHASE = TARGET_USD_VALUE / SAMISH_TOKEN_PRICE_USD; // 200 tokens
 
-export default function SamishTokenPurchase({ onPurchaseComplete, isPurchased }: SamishTokenPurchaseProps) {
-  const [step, setStep] = useState<"info" | "purchase" | "confirm">("info");
+export default function SamishTokenPurchase({
+  onPurchaseComplete,
+  isPurchased,
+  poolId,
+  poolDuration = 30
+}: SamishTokenPurchaseProps) {
+  const [step, setStep] = useState<"info" | "approve" | "purchase" | "burn" | "confirm">("info");
   const [purchaseAmount] = useState("10"); // Fixed $10 purchase
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasCompletedPurchase, setHasCompletedPurchase] = useState(false);
+  const [currentPoolId, setCurrentPoolId] = useState(poolId || `pool_${Date.now()}`);
   const { toast } = useToast();
+
+  const {
+    isProcessing: isContractProcessing,
+    needsApproval,
+    tokenBalance,
+    totalBurned,
+    approveTokens,
+    depositForPool,
+    burnTokensForPool,
+    safetyRefund,
+    canSafetyRefund,
+  } = useTokenBurnEscrow();
 
   const handlePaymentStarted = () => {
     setIsProcessing(true);
@@ -39,25 +60,65 @@ export default function SamishTokenPurchase({ onPurchaseComplete, isPurchased }:
     });
   };
 
-  const handlePaymentCompleted = () => {
+  const handlePaymentCompleted = async () => {
     setIsProcessing(false);
     setHasCompletedPurchase(true);
 
     toast({
-      title: "Purchase Successful!",
-      description: `Purchased ${TOKENS_TO_PURCHASE} Samish Creator tokens`,
+      title: "Payment Successful!",
+      description: "Now depositing tokens to escrow contract...",
     });
 
-    // Simulate burning and locking mechanism
-    setTimeout(() => {
+    // Check if tokens need approval first
+    if (needsApproval) {
+      setStep("approve");
+    } else {
+      await handleTokenDeposit();
+    }
+  };
+
+  const handleTokenDeposit = async () => {
+    const success = await depositForPool("200", poolDuration, currentPoolId); // 200 tokens worth $10
+
+    if (success) {
       toast({
-        title: "Tokens Locked & Burned",
-        description: "$5 burned, $5 locked for refund after pool ends",
+        title: "Tokens Deposited",
+        description: "Tokens deposited to escrow, now burning deflationary portion...",
+      });
+      setStep("burn");
+
+      // Automatically burn tokens after deposit
+      setTimeout(() => handleTokenBurn(), 2000);
+    }
+  };
+
+  const handleTokenBurn = async () => {
+    const success = await burnTokensForPool(currentPoolId);
+
+    if (success) {
+      toast({
+        title: "Tokens Burned & Escrowed",
+        description: "$5 burned for deflation, $5 locked for refund after pool ends",
         variant: "default"
       });
       setStep("confirm");
-      onPurchaseComplete();
-    }, 2000);
+      onPurchaseComplete(currentPoolId);
+    }
+  };
+
+  const handleApproval = async () => {
+    const success = await approveTokens("200"); // Approve 200 tokens
+    if (success) {
+      await handleTokenDeposit();
+    }
+  };
+
+  const handleSafetyRefund = async () => {
+    const success = await safetyRefund(currentPoolId);
+    if (success) {
+      setStep("info");
+      setHasCompletedPurchase(false);
+    }
   };
 
   if (isPurchased) {
@@ -121,6 +182,70 @@ export default function SamishTokenPurchase({ onPurchaseComplete, isPurchased }:
           <Coins className="w-4 h-4 mr-2" />
           Buy with Flexible Payment
         </Button>
+      </div>
+    );
+  }
+
+  if (step === "approve" && needsApproval) {
+    return (
+      <Card className="border-yellow-500/20">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            <h3 className="text-sm font-medium text-white">Token Approval Required</h3>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-lg">
+            <p className="text-xs text-gray-300 mb-3">
+              Before depositing tokens to the escrow contract, you need to approve the contract to spend your SAMISH tokens.
+            </p>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Your Balance:</span>
+                <span className="text-white">{parseFloat(tokenBalance).toFixed(2)} SAMISH</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Required:</span>
+                <span className="text-white">200 SAMISH</span>
+              </div>
+            </div>
+          </div>
+
+          <Button
+            onClick={handleApproval}
+            disabled={isContractProcessing}
+            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            {isContractProcessing ? (
+              <>Processing...</>
+            ) : (
+              <><Check className="w-4 h-4 mr-2" />Approve Tokens</>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (step === "burn") {
+    return (
+      <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 space-y-3">
+        <div className="flex items-center gap-2 text-orange-400">
+          <Flame className="w-5 h-5 animate-pulse" />
+          <span className="text-sm font-bold">Burning Deflationary Tokens...</span>
+        </div>
+
+        <div className="text-xs text-gray-300">
+          <p>• Depositing 200 SAMISH tokens to escrow contract</p>
+          <p>• Burning 100 tokens ($5) for deflationary tokenomics</p>
+          <p>• Locking 100 tokens ($5) for refund after pool completion</p>
+        </div>
+
+        <div className="bg-black/40 p-2 rounded text-xs text-gray-300">
+          <Lock className="w-3 h-3 inline mr-1" />
+          Processing onchain transactions...
+        </div>
       </div>
     );
   }

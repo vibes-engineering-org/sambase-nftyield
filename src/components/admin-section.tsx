@@ -3,7 +3,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Shield, Flame, TrendingUp, Users, DollarSign, BarChart3, Activity } from "lucide-react";
 
-export default function AdminSection() {
+interface AdminSectionProps {
+  pools?: any[];
+  totalBurned?: string;
+}
+
+export default function AdminSection({ pools = [], totalBurned = "0" }: AdminSectionProps) {
+  const totalUsers = 147 + pools.length; // Base users + pool creators
+  const activePools = pools.filter(p => p.status === 'active').length;
+  const totalVolume = (parseFloat(totalBurned) * 2 * 0.05) + 2340; // Burned * 2 (since 50% is burned) * price + base volume
+  const pendingRefunds = pools.length * 5; // $5 per pool in escrow
 
   return (
     <div className="space-y-4">
@@ -22,22 +31,22 @@ export default function AdminSection() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-center">
               <Users className="w-6 h-6 text-blue-400 mx-auto mb-1" />
-              <div className="text-lg font-bold text-blue-400">147</div>
+              <div className="text-lg font-bold text-blue-400">{totalUsers}</div>
               <div className="text-xs text-gray-400">Total Users</div>
             </div>
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
               <TrendingUp className="w-6 h-6 text-green-400 mx-auto mb-1" />
-              <div className="text-lg font-bold text-green-400">23</div>
+              <div className="text-lg font-bold text-green-400">{activePools}</div>
               <div className="text-xs text-gray-400">Active Pools</div>
             </div>
             <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 text-center">
               <DollarSign className="w-6 h-6 text-purple-400 mx-auto mb-1" />
-              <div className="text-lg font-bold text-purple-400">$89.50</div>
+              <div className="text-lg font-bold text-purple-400">${pendingRefunds.toFixed(2)}</div>
               <div className="text-xs text-gray-400">Pending Refunds</div>
             </div>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-center">
               <BarChart3 className="w-6 h-6 text-yellow-400 mx-auto mb-1" />
-              <div className="text-lg font-bold text-yellow-400">$2,340</div>
+              <div className="text-lg font-bold text-yellow-400">${totalVolume.toFixed(0)}</div>
               <div className="text-xs text-gray-400">Total Volume</div>
             </div>
           </div>
