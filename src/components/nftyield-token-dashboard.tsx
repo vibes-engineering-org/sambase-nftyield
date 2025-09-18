@@ -46,30 +46,8 @@ export default function NFTYieldTokenDashboard({ onStake, onUnstake }: TokenDash
     totalEarned: "0"
   });
   const [transactions, setTransactions] = useState<TokenTransaction[]>([]);
-  const [stakingPools, setStakingPools] = useState<StakingPool[]>([
-    {
-      id: "pool_1",
-      name: "NFTY Core Pool",
-      tokenAddress: "0x...",
-      stakingReward: 12,
-      lockPeriod: 30,
-      totalStaked: "2000000",
-      userStaked: "0",
-      rewardsAccrued: "0",
-      isActive: true
-    },
-    {
-      id: "pool_2",
-      name: "High Yield Pool",
-      tokenAddress: "0x...",
-      stakingReward: 25,
-      lockPeriod: 90,
-      totalStaked: "500000",
-      userStaked: "0",
-      rewardsAccrued: "0",
-      isActive: true
-    }
-  ]);
+  // No staking pools are currently available
+  const [stakingPools, setStakingPools] = useState<StakingPool[]>([]);
 
   const { toast } = useToast();
 
@@ -221,11 +199,11 @@ export default function NFTYieldTokenDashboard({ onStake, onUnstake }: TokenDash
             </div>
             <div className="space-y-2">
               <p className="text-xs text-gray-400">Staked Tokens</p>
-              <p className="text-xl font-bold text-purple-400">
+              <p className="text-xl font-bold text-gray-500">
                 {parseFloat(tokenBalance.staked).toLocaleString()}
               </p>
-              <p className="text-xs text-gray-400">
-                Earning {12}% APY
+              <p className="text-xs text-gray-500">
+                No staking available
               </p>
             </div>
             <div className="space-y-2">
@@ -358,71 +336,15 @@ export default function NFTYieldTokenDashboard({ onStake, onUnstake }: TokenDash
         </TabsContent>
 
         <TabsContent value="staking" className="space-y-4">
-          {stakingPools.map((pool) => (
-            <Card key={pool.id} className="neon-card">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-white text-sm">{pool.name}</CardTitle>
-                    <CardDescription className="text-xs">
-                      {pool.stakingReward}% APY • {pool.lockPeriod} day lock
-                    </CardDescription>
-                  </div>
-                  <Badge className={pool.isActive ? "bg-green-500/20 text-green-300" : "bg-gray-500/20 text-gray-400"}>
-                    {pool.isActive ? "Active" : "Inactive"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <p className="text-gray-400">Your Stake</p>
-                    <p className="text-white font-medium">
-                      {parseFloat(pool.userStaked).toLocaleString()} NFTY
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400">Rewards Earned</p>
-                    <p className="text-green-400 font-medium">
-                      {parseFloat(pool.rewardsAccrued).toFixed(4)} NFTY
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400">Total Pool</p>
-                    <p className="text-purple-400 font-medium">
-                      {parseFloat(pool.totalStaked).toLocaleString()} NFTY
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400">APY</p>
-                    <p className="text-yellow-400 font-medium">{pool.stakingReward}%</p>
-                  </div>
-                </div>
-
-                <Separator className="bg-gray-700" />
-
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="flex-1 neon-button text-xs"
-                    onClick={() => handleStake(pool.id, "100")}
-                    disabled={parseFloat(tokenBalance.balance) < 100}
-                  >
-                    Stake 100 NFTY
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 text-xs border-gray-600 hover:border-red-400 hover:text-red-400"
-                    onClick={() => handleUnstake(pool.id)}
-                    disabled={parseFloat(pool.userStaked) === 0}
-                  >
-                    Unstake All
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <Card className="neon-card">
+            <CardContent className="py-8 text-center">
+              <div className="space-y-3">
+                <Lock className="w-12 h-12 text-gray-400 mx-auto" />
+                <h3 className="text-lg font-semibold text-gray-400">No Staking Available</h3>
+                <p className="text-gray-500 text-sm">Staking pools are not yet active</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">

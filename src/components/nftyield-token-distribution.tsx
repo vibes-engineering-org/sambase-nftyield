@@ -47,7 +47,7 @@ const DISTRIBUTION_PHASES: DistributionPhase[] = [
     allocation: 10,
     totalTokens: "10000000",
     price: 0.005,
-    status: "completed",
+    status: "upcoming",
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-02-01"),
     description: "Early investors and founders"
@@ -57,7 +57,7 @@ const DISTRIBUTION_PHASES: DistributionPhase[] = [
     allocation: 15,
     totalTokens: "15000000",
     price: 0.008,
-    status: "completed",
+    status: "upcoming",
     startDate: new Date("2024-02-01"),
     endDate: new Date("2024-03-01"),
     description: "Strategic partners and VCs"
@@ -67,7 +67,7 @@ const DISTRIBUTION_PHASES: DistributionPhase[] = [
     allocation: 25,
     totalTokens: "25000000",
     price: 0.01,
-    status: "active",
+    status: "upcoming",
     startDate: new Date("2024-03-01"),
     endDate: new Date("2024-04-01"),
     description: "Community members and retail investors"
@@ -114,28 +114,8 @@ const DISTRIBUTION_PHASES: DistributionPhase[] = [
   }
 ];
 
-const AIRDROP_CAMPAIGNS: AirdropCampaign[] = [
-  {
-    id: "genesis_airdrop",
-    name: "Genesis Airdrop",
-    tokensPerUser: "100",
-    totalTokens: "1000000",
-    claimed: "250000",
-    requirements: ["Hold NFT in wallet", "Join Discord", "Follow Twitter"],
-    status: "active",
-    endDate: new Date("2024-12-31")
-  },
-  {
-    id: "yield_farmers",
-    name: "Yield Farmers",
-    tokensPerUser: "50",
-    totalTokens: "500000",
-    claimed: "150000",
-    requirements: ["Create yield pool", "Stake for 30+ days"],
-    status: "active",
-    endDate: new Date("2025-06-30")
-  }
-];
+// No airdrops are currently active
+const AIRDROP_CAMPAIGNS: AirdropCampaign[] = [];
 
 export default function NFTYieldTokenDistribution() {
   const [selectedPhase, setSelectedPhase] = useState<DistributionPhase | null>(null);
@@ -147,11 +127,11 @@ export default function NFTYieldTokenDistribution() {
     stakingDays: 0
   });
 
-  const totalDistributed = DISTRIBUTION_PHASES
-    .filter(phase => phase.status === "completed")
-    .reduce((sum, phase) => sum + parseFloat(phase.totalTokens), 0);
+  // No tokens have actually been distributed yet
+  const totalDistributed = 0;
 
-  const currentPrice = DISTRIBUTION_PHASES.find(p => p.status === "active")?.price || 0.01;
+  // No active sales, so no established price yet
+  const currentPrice = 0;
 
   useEffect(() => {
     // Check user eligibility from localStorage or API
@@ -236,7 +216,7 @@ export default function NFTYieldTokenDistribution() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-400">Current Price</p>
-              <p className="text-xl font-bold text-green-400">${currentPrice}</p>
+              <p className="text-xl font-bold text-gray-500">Not Available</p>
             </div>
             <div>
               <p className="text-gray-400">Total Distributed</p>
@@ -246,13 +226,13 @@ export default function NFTYieldTokenDistribution() {
             </div>
             <div>
               <p className="text-gray-400">Market Cap</p>
-              <p className="text-lg font-bold text-purple-400">
-                ${(totalDistributed * currentPrice / 1000).toFixed(0)}K
+              <p className="text-lg font-bold text-gray-500">
+                $0
               </p>
             </div>
             <div>
-              <p className="text-gray-400">Holders</p>
-              <p className="text-lg font-bold text-yellow-400">1,247</p>
+              <p className="text-gray-400">Current Holders</p>
+              <p className="text-lg font-bold text-gray-500">0</p>
             </div>
           </div>
 
@@ -345,102 +325,15 @@ export default function NFTYieldTokenDistribution() {
         </TabsContent>
 
         <TabsContent value="airdrops" className="space-y-4">
-          {AIRDROP_CAMPAIGNS.map((campaign) => {
-            const progress = (parseFloat(campaign.claimed) / parseFloat(campaign.totalTokens)) * 100;
-            const isClaimed = claims.includes(campaign.id);
-
-            let isEligible = false;
-            if (campaign.id === "genesis_airdrop") {
-              isEligible = userEligibility.hasNFT && userEligibility.hasDiscord && userEligibility.hasTwitter;
-            } else if (campaign.id === "yield_farmers") {
-              isEligible = userEligibility.hasYieldPool && userEligibility.stakingDays >= 30;
-            }
-
-            return (
-              <Card key={campaign.id} className="neon-card">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-purple-400" />
-                      <CardTitle className="text-purple-400 text-sm">{campaign.name}</CardTitle>
-                    </div>
-                    <Badge className={campaign.status === "active" ? "bg-green-500/20 text-green-300" : "bg-gray-500/20 text-gray-300"}>
-                      {campaign.status.toUpperCase()}
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-xs">
-                    {campaign.tokensPerUser} NFTY per eligible user
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <p className="text-gray-400">Reward</p>
-                      <p className="text-green-400 font-bold">{campaign.tokensPerUser} NFTY</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400">Ends</p>
-                      <p className="text-white">{campaign.endDate.toLocaleDateString()}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-400">Claimed</span>
-                      <span className="text-white">
-                        {(parseFloat(campaign.claimed) / 1000).toFixed(0)}K / {(parseFloat(campaign.totalTokens) / 1000).toFixed(0)}K
-                      </span>
-                    </div>
-                    <Progress value={progress} className="h-1" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-gray-300">Requirements:</p>
-                    <div className="space-y-1">
-                      {campaign.requirements.map((req, index) => {
-                        let isMet = false;
-                        if (req.includes("NFT")) isMet = userEligibility.hasNFT;
-                        if (req.includes("Discord")) isMet = userEligibility.hasDiscord;
-                        if (req.includes("Twitter")) isMet = userEligibility.hasTwitter;
-                        if (req.includes("pool")) isMet = userEligibility.hasYieldPool;
-                        if (req.includes("30+ days")) isMet = userEligibility.stakingDays >= 30;
-
-                        return (
-                          <div key={index} className="flex items-center gap-2 text-xs">
-                            <div className={`w-2 h-2 rounded-full ${isMet ? "bg-green-400" : "bg-gray-600"}`} />
-                            <span className={isMet ? "text-green-400" : "text-gray-400"}>{req}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => claimAirdrop(campaign.id)}
-                    disabled={!isEligible || isClaimed || campaign.status !== "active"}
-                    className="w-full neon-button text-xs"
-                  >
-                    {isClaimed ? (
-                      <>
-                        <Award className="w-3 h-3 mr-1" />
-                        Already Claimed
-                      </>
-                    ) : !isEligible ? (
-                      <>
-                        <Users className="w-3 h-3 mr-1" />
-                        Requirements Not Met
-                      </>
-                    ) : (
-                      <>
-                        <Gift className="w-3 h-3 mr-1" />
-                        Claim {campaign.tokensPerUser} NFTY
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+          <Card className="neon-card">
+            <CardContent className="py-8 text-center">
+              <div className="space-y-3">
+                <Gift className="w-12 h-12 text-gray-400 mx-auto" />
+                <h3 className="text-lg font-semibold text-gray-400">No Airdrops Available</h3>
+                <p className="text-gray-500 text-sm">No airdrop campaigns are currently active</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
