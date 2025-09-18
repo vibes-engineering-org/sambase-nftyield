@@ -11,7 +11,10 @@ import { DaimoPayTransferButton } from "~/components/daimo-pay-transfer-button";
 import { useToast } from "~/hooks/use-toast";
 import AdminSection from "~/components/admin-section";
 import ViralShare from "~/components/viral-share";
-import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame } from "lucide-react";
+import ReferralSystem from "~/components/referral-system";
+import CustomYieldPools from "~/components/custom-yield-pools";
+import CommunityForum from "~/components/community-forum";
+import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
 
@@ -27,8 +30,9 @@ interface YieldPool {
 }
 
 export default function YieldPoolApp() {
-  const [activeTab, setActiveTab] = useState<"create" | "manage" | "admin" | "share">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "manage" | "custom" | "referrals" | "community" | "admin" | "share">("create");
   const [pools, setPools] = useState<YieldPool[]>([]);
+  const [customPools, setCustomPools] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     nftCollection: "",
     tokenAddress: "",
@@ -37,6 +41,7 @@ export default function YieldPoolApp() {
     contributionAmount: ""
   });
   const [hasTokensLocked, setHasTokensLocked] = useState(false);
+  const [referralBonus, setReferralBonus] = useState(0);
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -100,6 +105,22 @@ export default function YieldPoolApp() {
     });
   };
 
+  const handleReferralComplete = (bonus: number) => {
+    setReferralBonus(prev => prev + bonus);
+    toast({
+      title: "Referral Bonus Earned!",
+      description: `You earned $${bonus} from your referral program`
+    });
+  };
+
+  const handleCustomPoolCreate = (pool: any) => {
+    setCustomPools(prev => [...prev, pool]);
+    toast({
+      title: "Custom Pool Created",
+      description: `${pool.name} is now active and collecting contributions`
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black cyber-grid">
       <div className="w-full max-w-md mx-auto p-3 space-y-4">
@@ -124,7 +145,7 @@ export default function YieldPoolApp() {
         </div>
 
         {/* Tab Navigation - Mobile Optimized */}
-        <div className="grid grid-cols-2 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
           <Button
             variant={activeTab === "create" ? "default" : "ghost"}
             onClick={() => setActiveTab("create")}
@@ -139,7 +160,31 @@ export default function YieldPoolApp() {
             className={`${activeTab === "manage" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
           >
             <TrendingUp className="w-3 h-3 mr-1" />
-            Pools ({pools.length})
+            Pools
+          </Button>
+          <Button
+            variant={activeTab === "custom" ? "default" : "ghost"}
+            onClick={() => setActiveTab("custom")}
+            className={`${activeTab === "custom" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+          >
+            <Wrench className="w-3 h-3 mr-1" />
+            Custom
+          </Button>
+          <Button
+            variant={activeTab === "referrals" ? "default" : "ghost"}
+            onClick={() => setActiveTab("referrals")}
+            className={`${activeTab === "referrals" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+          >
+            <Gift className="w-3 h-3 mr-1" />
+            Referrals
+          </Button>
+          <Button
+            variant={activeTab === "community" ? "default" : "ghost"}
+            onClick={() => setActiveTab("community")}
+            className={`${activeTab === "community" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+          >
+            <MessageSquare className="w-3 h-3 mr-1" />
+            Forum
           </Button>
           <Button
             variant={activeTab === "share" ? "default" : "ghost"}
@@ -346,6 +391,18 @@ export default function YieldPoolApp() {
               ))
             )}
           </div>
+        )}
+
+        {activeTab === "custom" && (
+          <CustomYieldPools onPoolCreate={handleCustomPoolCreate} />
+        )}
+
+        {activeTab === "referrals" && (
+          <ReferralSystem onReferralComplete={handleReferralComplete} />
+        )}
+
+        {activeTab === "community" && (
+          <CommunityForum userPools={[...pools, ...customPools]} />
         )}
 
         {activeTab === "admin" && (
