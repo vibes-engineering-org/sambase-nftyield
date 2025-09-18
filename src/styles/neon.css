@@ -1,0 +1,111 @@
+/* Neon Glowing Effects */
+@keyframes neon-pulse {
+  0%, 100% {
+    text-shadow:
+      0 0 5px #00ffff,
+      0 0 10px #00ffff,
+      0 0 15px #00ffff,
+      0 0 20px #00ffff;
+  }
+  50% {
+    text-shadow:
+      0 0 2px #00ffff,
+      0 0 5px #00ffff,
+      0 0 8px #00ffff,
+      0 0 12px #00ffff;
+  }
+}
+
+@keyframes neon-border {
+  0%, 100% {
+    border-color: #00ffff;
+    box-shadow:
+      0 0 5px #00ffff,
+      0 0 10px #00ffff,
+      0 0 15px #00ffff,
+      inset 0 0 5px #00ffff20;
+  }
+  50% {
+    border-color: #ff00ff;
+    box-shadow:
+      0 0 5px #ff00ff,
+      0 0 10px #ff00ff,
+      0 0 15px #ff00ff,
+      inset 0 0 5px #ff00ff20;
+  }
+}
+
+@keyframes neon-glow {
+  0%, 100% {
+    background: linear-gradient(45deg, #00ffff20, #ff00ff20);
+    box-shadow:
+      0 0 10px #00ffff40,
+      0 0 20px #ff00ff40;
+  }
+  50% {
+    background: linear-gradient(45deg, #ff00ff20, #00ffff20);
+    box-shadow:
+      0 0 10px #ff00ff40,
+      0 0 20px #00ffff40;
+  }
+}
+
+.neon-text {
+  animation: neon-pulse 2s ease-in-out infinite;
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.neon-border {
+  border: 2px solid #00ffff;
+  animation: neon-border 3s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.neon-card {
+  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+  border: 1px solid #333;
+  animation: neon-glow 4s ease-in-out infinite;
+  backdrop-filter: blur(10px);
+}
+
+.neon-button {
+  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  border: none;
+  color: #000;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.neon-button:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 20px #00ffff,
+    0 0 40px #ff00ff;
+}
+
+.cyber-grid {
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.neon-input {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00ffff40;
+  color: #00ffff;
+}
+
+.neon-input:focus {
+  border-color: #00ffff;
+  box-shadow: 0 0 10px #00ffff40;
+  outline: none;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
