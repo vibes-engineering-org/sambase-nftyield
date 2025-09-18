@@ -14,11 +14,14 @@ import ViralShare from "~/components/viral-share";
 import ReferralSystem from "~/components/referral-system";
 import CustomYieldPools from "~/components/custom-yield-pools";
 import ActivePoolChat from "~/components/active-pool-chat";
-import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench, Trophy } from "lucide-react";
+import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench, Trophy, Coins } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";
 import LotteryDisplay from "~/components/lottery-display";
 import { useTokenBurnEscrow } from "~/hooks/useTokenBurnEscrow";
+import NFTYieldTokenMint from "~/components/nftyield-token-mint";
+import NFTYieldTokenDashboard from "~/components/nftyield-token-dashboard";
+import NFTYieldTokenDistribution from "~/components/nftyield-token-distribution";
 
 interface YieldPool {
   id: string;
@@ -32,7 +35,7 @@ interface YieldPool {
 }
 
 export default function YieldPoolApp() {
-  const [activeTab, setActiveTab] = useState<"create" | "manage" | "custom" | "referrals" | "community" | "lottery" | "admin" | "share">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "manage" | "custom" | "referrals" | "community" | "lottery" | "admin" | "share" | "token">("create");
   const [pools, setPools] = useState<YieldPool[]>([]);
   const [customPools, setCustomPools] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -218,7 +221,7 @@ export default function YieldPoolApp() {
 
         {/* Tab Navigation - Mobile Optimized */}
         <div className="space-y-2">
-          <div className="grid grid-cols-4 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
+          <div className="grid grid-cols-5 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
             <Button
               variant={activeTab === "create" ? "default" : "ghost"}
               onClick={() => setActiveTab("create")}
@@ -234,6 +237,14 @@ export default function YieldPoolApp() {
             >
               <TrendingUp className="w-3 h-3 mr-1" />
               Pools
+            </Button>
+            <Button
+              variant={activeTab === "token" ? "default" : "ghost"}
+              onClick={() => setActiveTab("token")}
+              className={`${activeTab === "token" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Coins className="w-3 h-3 mr-1" />
+              Token
             </Button>
             <Button
               variant={activeTab === "lottery" ? "default" : "ghost"}
@@ -505,6 +516,53 @@ export default function YieldPoolApp() {
             totalEarned="0"
             nftCount={0}
           />
+        )}
+
+        {activeTab === "token" && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab("token")}
+                className="text-xs border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
+              >
+                Mint
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab("token")}
+                className="text-xs border-purple-400/30 bg-purple-400/10 text-purple-300"
+              >
+                Portfolio
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab("token")}
+                className="text-xs border-green-400/30 bg-green-400/10 text-green-300"
+              >
+                Distribution
+              </Button>
+            </div>
+
+            {/* Token Sub-tabs */}
+            <div className="space-y-4">
+              <NFTYieldTokenMint onMintComplete={(amount, tier) => {
+                toast({
+                  title: "NFTY Tokens Minted!",
+                  description: `Successfully minted ${amount} NFTY tokens at ${tier} tier`
+                });
+              }} />
+
+              <NFTYieldTokenDashboard onStake={(poolId, amount) => {
+                toast({
+                  title: "Tokens Staked",
+                  description: `${amount} NFTY tokens staked in pool ${poolId}`
+                });
+              }} />
+
+              <NFTYieldTokenDistribution />
+            </div>
+          </div>
         )}
 
         {/* Footer with Total Burned */}
