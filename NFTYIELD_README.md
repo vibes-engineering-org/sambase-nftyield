@@ -93,7 +93,7 @@ pnpm (recommended package manager)
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/nftyield.git
+git clone https://github.com/vibes-engineering-org/sambase-nftyield.git
 
 # Install dependencies
 pnpm install

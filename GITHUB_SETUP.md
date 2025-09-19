@@ -41,7 +41,7 @@ git commit -m "Initial commit: NFTYield platform with cleaned token information"
 
 ```bash
 # Add GitHub remote (replace USERNAME with your GitHub username)
-git remote add origin https://github.com/USERNAME/nftyield.git
+git remote add origin https://github.com/vibes-engineering-org/sambase-nftyield.git
 
 # Push to GitHub
 git branch -M main
@@ -315,7 +315,7 @@ Before announcing your repository:
 
 Once your repository is set up:
 
-1. **Share the URL**: `https://github.com/USERNAME/nftyield`
+1. **Share the URL**: `https://github.com/vibes-engineering-org/sambase-nftyield`
 2. **Social Media**: Announce on Twitter, Farcaster, Discord
 3. **Community Forums**: Share in relevant Web3/DeFi communities
 4. **Documentation**: Update any external links to point to the new repository
