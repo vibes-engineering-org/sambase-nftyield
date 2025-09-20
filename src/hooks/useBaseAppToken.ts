@@ -53,6 +53,43 @@ const BASE_APP_TOKEN_ABI = [
     "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+    "name": "burn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "transfer",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "spender", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "owner", "type": "address"},
+      {"internalType": "address", "name": "spender", "type": "address"}
+    ],
+    "name": "allowance",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
   }
 ] as const;
 
@@ -123,6 +160,44 @@ export function useBaseAppToken() {
     }
   };
 
+  const burnTokens = async (amount: string) => {
+    if (!amount || !isConnected) return;
+
+    try {
+      setIsLoading(true);
+      await writeContract({
+        address: BASE_APP_TOKEN_ADDRESS,
+        abi: BASE_APP_TOKEN_ABI,
+        functionName: "burn",
+        args: [parseEther(amount)],
+        chainId: base.id,
+      });
+    } catch (err) {
+      console.error("Burn failed:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const transferTokens = async (to: Address, amount: string) => {
+    if (!to || !amount || !isConnected) return;
+
+    try {
+      setIsLoading(true);
+      await writeContract({
+        address: BASE_APP_TOKEN_ADDRESS,
+        abi: BASE_APP_TOKEN_ABI,
+        functionName: "transfer",
+        args: [to, parseEther(amount)],
+        chainId: base.id,
+      });
+    } catch (err) {
+      console.error("Transfer failed:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const formatTokenAmount = (amount: bigint | undefined) => {
     if (!amount) return "0";
     return parseFloat(formatEther(amount)).toLocaleString(undefined, {
@@ -155,6 +230,8 @@ export function useBaseAppToken() {
 
     // Functions
     buyTokens,
+    burnTokens,
+    transferTokens,
     formatTokenAmount,
     formatPrice,
   };

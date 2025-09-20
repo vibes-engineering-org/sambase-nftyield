@@ -2,10 +2,11 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract BaseAppToken is ERC20, Ownable, ReentrancyGuard {
+contract BaseAppToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     uint256 public constant TOTAL_SUPPLY = 1_000_000_000 * 10**18; // 1 billion tokens
     uint256 public constant MARKETING_ALLOCATION = 100_000_000 * 10**18; // 100 million tokens (10%)
     address public constant MARKETING_WALLET = 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2;
@@ -20,6 +21,7 @@ contract BaseAppToken is ERC20, Ownable, ReentrancyGuard {
     event TokensPurchased(address indexed buyer, uint256 amount, uint256 cost);
     event TradingEnabled();
     event WhitelistUpdated(address indexed account, bool status);
+    event TokensBurned(address indexed burner, uint256 amount);
 
     constructor() ERC20("BaseApp Token", "BAPP") {
         // Mint total supply to contract
@@ -86,6 +88,17 @@ contract BaseAppToken is ERC20, Ownable, ReentrancyGuard {
     function emergencyWithdrawTokens(uint256 amount) external onlyOwner {
         require(balanceOf(address(this)) >= amount, "Insufficient tokens");
         _transfer(address(this), owner(), amount);
+    }
+
+    // Override burn function to emit custom event
+    function burn(uint256 amount) public override {
+        super.burn(amount);
+        emit TokensBurned(msg.sender, amount);
+    }
+
+    function burnFrom(address account, uint256 amount) public override {
+        super.burnFrom(account, amount);
+        emit TokensBurned(account, amount);
     }
 
     // Override transfer functions to add trading restrictions if needed

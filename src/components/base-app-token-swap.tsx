@@ -10,10 +10,11 @@ import { Separator } from "~/components/ui/separator";
 import { useBaseAppToken } from "~/hooks/useBaseAppToken";
 import { useToast } from "~/hooks/use-toast";
 import TokenSwapIntegration from "~/components/ui/token-swap-integration";
-import { Coins, TrendingUp, Wallet, Zap, ArrowUpDown, DollarSign } from "lucide-react";
+import TokenManager from "~/components/token-manager";
+import { Coins, TrendingUp, Wallet, Zap, ArrowUpDown, DollarSign, Settings } from "lucide-react";
 
 export default function BaseAppTokenSwap() {
-  const [activeView, setActiveView] = useState<"buy" | "stats" | "trade">("buy");
+  const [activeView, setActiveView] = useState<"buy" | "stats" | "trade" | "manage">("buy");
   const { toast } = useToast();
 
   const {
@@ -89,29 +90,37 @@ export default function BaseAppTokenSwap() {
       </Card>
 
       {/* Navigation */}
-      <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
+      <div className="grid grid-cols-4 gap-1 p-1 bg-gray-900/80 rounded-lg neon-border">
         <Button
           variant={activeView === "buy" ? "default" : "ghost"}
           onClick={() => setActiveView("buy")}
-          className={`${activeView === "buy" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+          className={`${activeView === "buy" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs px-2`}
         >
-          <Zap className="w-4 h-4 mr-1" />
+          <Zap className="w-3 h-3 mr-1" />
           Buy
+        </Button>
+        <Button
+          variant={activeView === "manage" ? "default" : "ghost"}
+          onClick={() => setActiveView("manage")}
+          className={`${activeView === "manage" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs px-2`}
+        >
+          <Settings className="w-3 h-3 mr-1" />
+          Manage
         </Button>
         <Button
           variant={activeView === "trade" ? "default" : "ghost"}
           onClick={() => setActiveView("trade")}
-          className={`${activeView === "trade" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+          className={`${activeView === "trade" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs px-2`}
         >
-          <ArrowUpDown className="w-4 h-4 mr-1" />
+          <ArrowUpDown className="w-3 h-3 mr-1" />
           Trade
         </Button>
         <Button
           variant={activeView === "stats" ? "default" : "ghost"}
           onClick={() => setActiveView("stats")}
-          className={`${activeView === "stats" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+          className={`${activeView === "stats" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs px-2`}
         >
-          <TrendingUp className="w-4 h-4 mr-1" />
+          <TrendingUp className="w-3 h-3 mr-1" />
           Stats
         </Button>
       </div>
@@ -236,6 +245,8 @@ export default function BaseAppTokenSwap() {
           </CardContent>
         </Card>
       )}
+
+      {activeView === "manage" && <TokenManager />}
 
       {activeView === "trade" && (
         <TokenSwapIntegration
