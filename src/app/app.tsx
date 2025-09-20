@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import YieldPoolApp from "~/components/yield/yield-pool-app";
 import BaseAppTokenSwap from "~/components/base-app-token-swap";
-import { Coins, TrendingUp, Star } from "lucide-react";
+import SplitContract from "~/components/split-contract";
+import { Coins, TrendingUp, Star, Split } from "lucide-react";
 
 export default function App() {
-  const [activeApp, setActiveApp] = useState<"nftyield" | "basetoken">("basetoken");
+  const [activeApp, setActiveApp] = useState<"nftyield" | "basetoken" | "split">("basetoken");
 
   return (
     <div className="min-h-screen bg-black">
@@ -34,22 +35,30 @@ export default function App() {
         </div>
 
         {/* App Selection */}
-        <div className="grid grid-cols-2 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border mb-4">
+        <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border mb-4">
           <Button
             variant={activeApp === "basetoken" ? "default" : "ghost"}
             onClick={() => setActiveApp("basetoken")}
-            className={`${activeApp === "basetoken" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+            className={`${activeApp === "basetoken" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
           >
-            <Coins className="w-4 h-4 mr-2" />
+            <Coins className="w-4 h-4 mr-1" />
             BAPP Token
           </Button>
           <Button
             variant={activeApp === "nftyield" ? "default" : "ghost"}
             onClick={() => setActiveApp("nftyield")}
-            className={`${activeApp === "nftyield" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+            className={`${activeApp === "nftyield" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
           >
-            <TrendingUp className="w-4 h-4 mr-2" />
+            <TrendingUp className="w-4 h-4 mr-1" />
             NFT Yield
+          </Button>
+          <Button
+            variant={activeApp === "split" ? "default" : "ghost"}
+            onClick={() => setActiveApp("split")}
+            className={`${activeApp === "split" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+          >
+            <Split className="w-4 h-4 mr-1" />
+            Split
           </Button>
         </div>
       </div>
@@ -63,6 +72,12 @@ export default function App() {
 
       {activeApp === "nftyield" && (
         <YieldPoolApp />
+      )}
+
+      {activeApp === "split" && (
+        <div className="w-full max-w-md mx-auto p-3">
+          <SplitContract />
+        </div>
       )}
 
       {/* TEMPLATE_CONTENT_END */}
