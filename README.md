@@ -1,26 +1,34 @@
-# vibes engineering mini app template
+# NFTYield - Farcaster Mini App
 
-**TL;DR:** A developer‑friendly Farcaster Mini App starter kit built with Next.js, React, TypeScript, Tailwind CSS, and the Mini Apps SDK. Comes with out‑of‑the‑box wallet auth, file uploads (Supabase), notifications, webhooks, and reusable UI components.
+**TL;DR:** A Farcaster Mini Application for NFT yield farming and portfolio management. Maximize your NFT portfolio returns through yield farming opportunities across multiple protocols. Built with Next.js, React, TypeScript, Tailwind CSS, and the Mini Apps SDK.
 
 ![image](https://github.com/user-attachments/assets/778893f9-ef65-48bd-a3d0-5e2b3e4b3453)
 
-contains a developer-ready template for Farcaster Mini Apps (formerly Frames v2) with out-of-the-box features:
+## NFTYield Features
 
-## Examples
+### Portfolio Management
+- **NFT Collection Overview**: View and track your entire NFT portfolio
+- **Real-time Valuation**: Monitor floor prices and estimated values
+- **Collection Analytics**: Insights into your most valuable assets
+- **Multi-chain Support**: Base, Arbitrum, Optimism, and more
 
-Visit `/examples` to see live demos of all the included components and features, including file uploads, payment buttons, and visitor counters.
+### Yield Farming
+- **Yield Pool Discovery**: Find the best yield farming opportunities
+- **Risk Assessment**: Evaluate pools with comprehensive risk scoring
+- **Yield Calculator**: Estimate returns before committing assets
+- **Multi-Protocol Integration**: NFTX, Fractional, and other DeFi protocols
 
-## Features
+### Analytics Dashboard
+- **Performance Tracking**: Monitor portfolio performance over time
+- **Reward Analytics**: Track earnings across all positions
+- **Yield Distribution**: Visualize income sources and strategies
+- **Historical Data**: Access to past performance metrics
 
-- shadcn/ui and Tailwind CSS for UI and styling
-- Mini Apps SDK integration via the `useFrameSDK` hook
-- Wallet authentication powered by Wagmi
-- Supabase file uploads with `FileUpload` and `FileUploadCard` components
-- Webhook handling route (`/api/webhook`)
-- `BucketExplorer` component for browsing Supabase storage
-- Optimized Open Graph image generation
-- Drag‑and‑drop Dropzone UI component
-- Theme support and toggle via `ThemeProvider` & `ThemeToggle`
+### Core Infrastructure
+- **Farcaster Mini App SDK**: Native integration with Farcaster ecosystem
+- **Wallet Authentication**: Secure Web3 wallet connection via Wagmi
+- **Mobile-First Design**: Optimized for mobile Farcaster clients
+- **Real-time Updates**: Live data feeds and notifications
 
 ## Architecture
 
