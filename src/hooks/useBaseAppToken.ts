@@ -6,6 +6,52 @@ import { parseEther, formatEther, Address } from "viem";
 import { base } from "wagmi/chains";
 
 const BASE_APP_TOKEN_ABI = [
+  // ERC20 Functions
+  {
+    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "transfer",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "spender", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "owner", "type": "address"},
+      {"internalType": "address", "name": "spender", "type": "address"}
+    ],
+    "name": "allowance",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  // Custom Token Functions
   {
     "inputs": [],
     "name": "getCurrentPrice",
@@ -41,19 +87,20 @@ const BASE_APP_TOKEN_ABI = [
     "type": "function"
   },
   {
-    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
-    "name": "balanceOf",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "tradingEnabled",
     "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
   },
+  {
+    "inputs": [],
+    "name": "totalSold",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  // Burnable Functions
   {
     "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
     "name": "burn",
@@ -63,31 +110,58 @@ const BASE_APP_TOKEN_ABI = [
   },
   {
     "inputs": [
-      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "address", "name": "account", "type": "address"},
       {"internalType": "uint256", "name": "amount", "type": "uint256"}
     ],
-    "name": "transfer",
-    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "name": "burnFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  // Owner Functions
+  {
+    "inputs": [],
+    "name": "enableTrading",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {"internalType": "address", "name": "spender", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+      {"internalType": "address", "name": "account", "type": "address"},
+      {"internalType": "bool", "name": "status", "type": "bool"}
     ],
-    "name": "approve",
-    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "name": "updateWhitelist",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {"internalType": "address", "name": "owner", "type": "address"},
-      {"internalType": "address", "name": "spender", "type": "address"}
-    ],
-    "name": "allowance",
+    "inputs": [],
+    "name": "withdrawETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  // Constants
+  {
+    "inputs": [],
+    "name": "TOTAL_SUPPLY",
     "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MARKETING_ALLOCATION",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MARKETING_WALLET",
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
   }
@@ -145,15 +219,17 @@ export function useBaseAppToken() {
     address: BASE_APP_TOKEN_ADDRESS,
     abi: BASE_APP_TOKEN_ABI,
     functionName: "calculateCost",
-    args: purchaseAmount ? [parseEther(purchaseAmount)] : undefined,
+    args: purchaseAmount && !isNaN(parseFloat(purchaseAmount)) && parseFloat(purchaseAmount) > 0
+      ? [parseEther(purchaseAmount)]
+      : undefined,
     chainId: base.id,
     query: {
-      enabled: !!purchaseAmount && !isNaN(parseFloat(purchaseAmount)),
+      enabled: isContractConfigured && !!purchaseAmount && !isNaN(parseFloat(purchaseAmount)) && parseFloat(purchaseAmount) > 0,
     },
   });
 
   const buyTokens = async () => {
-    if (!purchaseAmount || !purchaseCost || !isConnected) return;
+    if (!purchaseAmount || !purchaseCost || !isConnected || !isContractConfigured) return;
 
     try {
       setIsLoading(true);
@@ -167,6 +243,7 @@ export function useBaseAppToken() {
       });
     } catch (err) {
       console.error("Purchase failed:", err);
+      throw err; // Re-throw so the component can handle it
     } finally {
       setIsLoading(false);
     }
@@ -230,6 +307,7 @@ export function useBaseAppToken() {
     isSuccess,
     error,
     isConnected,
+    isContractConfigured,
 
     // Contract data
     totalSupply: contractInfo ? formatTokenAmount(contractInfo[0]) : "0",
@@ -239,6 +317,9 @@ export function useBaseAppToken() {
     userBalance: formatTokenAmount(userBalance),
     currentPrice: formatPrice(currentPrice),
     purchaseCost: purchaseCost ? formatEther(purchaseCost) : "0",
+
+    // Contract address for display
+    contractAddress: BASE_APP_TOKEN_ADDRESS,
 
     // Functions
     buyTokens,

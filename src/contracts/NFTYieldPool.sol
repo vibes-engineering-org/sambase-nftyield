@@ -3,10 +3,9 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title NFTYieldPool
@@ -14,7 +13,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * Allows users to create pools where NFT holders earn token rewards
  */
 contract NFTYieldPool is ReentrancyGuard, Ownable, Pausable {
-    using Counters for Counters.Counter;
 
     struct YieldPool {
         uint256 poolId;

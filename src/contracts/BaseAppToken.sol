@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract BaseAppToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     uint256 public constant TOTAL_SUPPLY = 1_000_000_000 * 10**18; // 1 billion tokens
@@ -23,15 +23,12 @@ contract BaseAppToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     event WhitelistUpdated(address indexed account, bool status);
     event TokensBurned(address indexed burner, uint256 amount);
 
-    constructor() ERC20("BaseApp Token", "BAPP") {
+    constructor() ERC20("BaseApp Token", "BAPP") Ownable(msg.sender) {
         // Mint total supply to contract
         _mint(address(this), TOTAL_SUPPLY - MARKETING_ALLOCATION);
 
         // Mint marketing allocation directly to marketing wallet
         _mint(MARKETING_WALLET, MARKETING_ALLOCATION);
-
-        // Set initial owner
-        _transferOwnership(msg.sender);
     }
 
     function getCurrentPrice() public view returns (uint256) {
@@ -102,30 +99,20 @@ contract BaseAppToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     }
 
     // Override transfer functions to add trading restrictions if needed
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        // Allow minting and burning
-        if (from == address(0) || to == address(0)) {
-            return;
+    function _update(address from, address to, uint256 amount) internal virtual override {
+        // Apply trading restrictions before the transfer
+        if (from != address(0) && to != address(0)) {
+            // Skip restrictions for contract interactions
+            if (from != address(this) && to != address(this)) {
+                // Skip restrictions for owner transfers
+                if (from != owner() && to != owner()) {
+                    // Check if trading is enabled or if addresses are whitelisted
+                    require(tradingEnabled || whitelisted[from] || whitelisted[to], "Trading not enabled");
+                }
+            }
         }
 
-        // Allow contract interactions
-        if (from == address(this) || to == address(this)) {
-            return;
-        }
-
-        // Allow owner transfers
-        if (from == owner() || to == owner()) {
-            return;
-        }
-
-        // Check if trading is enabled or if addresses are whitelisted
-        require(tradingEnabled || whitelisted[from] || whitelisted[to], "Trading not enabled");
+        super._update(from, to, amount);
     }
 
     function getContractInfo() external view returns (

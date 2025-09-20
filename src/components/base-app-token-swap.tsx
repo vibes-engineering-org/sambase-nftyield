@@ -26,6 +26,7 @@ export default function BaseAppTokenSwap() {
     isSuccess,
     error,
     isConnected,
+    isContractConfigured,
     totalSupply,
     totalSold,
     contractBalance,
@@ -33,6 +34,7 @@ export default function BaseAppTokenSwap() {
     userBalance,
     currentPrice,
     purchaseCost,
+    contractAddress,
     buyTokens,
   } = useBaseAppToken();
 
@@ -159,7 +161,30 @@ export default function BaseAppTokenSwap() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {!isConnected && (
+            {!isContractConfigured && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <Settings className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div>
+                    <p className="text-red-400 font-medium text-sm">Contract Not Deployed</p>
+                    <p className="text-gray-400 text-xs mt-1">
+                      The BaseApp Token contract hasn&apos;t been deployed yet.
+                    </p>
+                    <p className="text-gray-400 text-xs mt-1 font-mono">
+                      Current: {contractAddress}
+                    </p>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2 space-y-1">
+                    <p>Deploy the contract using:</p>
+                    <code className="bg-gray-800 px-2 py-1 rounded text-cyan-300">pnpm deploy:base-sepolia</code>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isConnected && isContractConfigured && (
               <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 text-center">
                 <Wallet className="w-5 h-5 text-orange-400 mx-auto mb-2" />
                 <p className="text-orange-400 text-sm font-medium">
@@ -209,7 +234,7 @@ export default function BaseAppTokenSwap() {
                   value={purchaseAmount}
                   onChange={(e) => setPurchaseAmount(e.target.value)}
                   className="neon-input text-sm"
-                  disabled={!isConnected || isLoading}
+                  disabled={!isContractConfigured || !isConnected || isLoading}
                 />
               </div>
 
@@ -235,10 +260,15 @@ export default function BaseAppTokenSwap() {
 
               <Button
                 onClick={!isConnected ? handleConnectWallet : handlePurchase}
-                disabled={isConnected && (!purchaseAmount || parseFloat(purchaseAmount) <= 0) || isLoading}
+                disabled={!isContractConfigured || (isConnected && (!purchaseAmount || parseFloat(purchaseAmount) <= 0)) || isLoading}
                 className="w-full neon-button text-sm py-4"
               >
-                {isLoading ? (
+                {!isContractConfigured ? (
+                  <>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Contract Not Deployed
+                  </>
+                ) : isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
                     Processing...
