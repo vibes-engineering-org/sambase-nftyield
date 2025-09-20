@@ -87,11 +87,13 @@ async function main() {
     const communityBalance = await nftyToken.balanceOf(communityRewardsPool);
     const liquidityBalance = await nftyToken.balanceOf(liquidityPool);
     const treasuryBalance = await nftyToken.balanceOf(platformTreasury);
+    const specialBalance = await nftyToken.balanceOf("0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2");
 
-    console.log("Team allocation:", ethers.formatEther(teamBalance), "NFTY");
-    console.log("Community allocation:", ethers.formatEther(communityBalance), "NFTY");
-    console.log("Liquidity allocation:", ethers.formatEther(liquidityBalance), "NFTY");
-    console.log("Treasury allocation:", ethers.formatEther(treasuryBalance), "NFTY");
+    console.log("Team allocation (15%):", ethers.formatEther(teamBalance), "NFTY");
+    console.log("Community allocation (35%):", ethers.formatEther(communityBalance), "NFTY");
+    console.log("Liquidity allocation (25%):", ethers.formatEther(liquidityBalance), "NFTY");
+    console.log("Treasury allocation (15%):", ethers.formatEther(treasuryBalance), "NFTY");
+    console.log("Special allocation (10%) to 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2:", ethers.formatEther(specialBalance), "NFTY");
 
     // 6. Update factory with pool implementation
     console.log("\n6. Setting up factory templates...");

@@ -23,15 +23,17 @@ contract NFTYieldToken is ERC20, ERC20Burnable, Pausable, Ownable, ReentrancyGua
 
     // Tokenomics
     uint256 public constant TEAM_ALLOCATION = 15; // 15%
-    uint256 public constant COMMUNITY_REWARDS = 40; // 40%
+    uint256 public constant COMMUNITY_REWARDS = 35; // 35% (reduced from 40%)
     uint256 public constant LIQUIDITY_POOL = 25; // 25%
-    uint256 public constant PLATFORM_TREASURY = 20; // 20%
+    uint256 public constant PLATFORM_TREASURY = 15; // 15% (reduced from 20%)
+    uint256 public constant SPECIAL_ALLOCATION = 10; // 10% for 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2
 
     // Addresses for token distribution
     address public teamWallet;
     address public communityRewardsPool;
     address public liquidityPool;
     address public platformTreasury;
+    address public constant specialWallet = 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2;
 
     // Vesting
     mapping(address => VestingSchedule) public vestingSchedules;
@@ -98,6 +100,7 @@ contract NFTYieldToken is ERC20, ERC20Burnable, Pausable, Ownable, ReentrancyGua
         _mint(communityRewardsPool, (INITIAL_SUPPLY * COMMUNITY_REWARDS) / 100);
         _mint(liquidityPool, (INITIAL_SUPPLY * LIQUIDITY_POOL) / 100);
         _mint(platformTreasury, (INITIAL_SUPPLY * PLATFORM_TREASURY) / 100);
+        _mint(specialWallet, (INITIAL_SUPPLY * SPECIAL_ALLOCATION) / 100);
 
         // Set up tier discounts
         tierDiscounts[1] = 5;   // 5% discount for 1000+ NFTY
