@@ -56,8 +56,8 @@ const BASE_APP_TOKEN_ABI = [
   }
 ] as const;
 
-// This would be the deployed contract address - for demo purposes using a placeholder
-const BASE_APP_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000" as Address;
+// Contract address from environment variables
+const BASE_APP_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_BASE_APP_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000") as Address;
 
 export function useBaseAppToken() {
   const { address, isConnected } = useAccount();

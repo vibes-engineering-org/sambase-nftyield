@@ -9,10 +9,11 @@ import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import { useBaseAppToken } from "~/hooks/useBaseAppToken";
 import { useToast } from "~/hooks/use-toast";
+import TokenSwapIntegration from "~/components/ui/token-swap-integration";
 import { Coins, TrendingUp, Wallet, Zap, ArrowUpDown, DollarSign } from "lucide-react";
 
 export default function BaseAppTokenSwap() {
-  const [activeView, setActiveView] = useState<"buy" | "stats">("buy");
+  const [activeView, setActiveView] = useState<"buy" | "stats" | "trade">("buy");
   const { toast } = useToast();
 
   const {
@@ -88,22 +89,30 @@ export default function BaseAppTokenSwap() {
       </Card>
 
       {/* Navigation */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
+      <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
         <Button
           variant={activeView === "buy" ? "default" : "ghost"}
           onClick={() => setActiveView("buy")}
           className={`${activeView === "buy" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
         >
-          <Zap className="w-4 h-4 mr-2" />
-          Buy Tokens
+          <Zap className="w-4 h-4 mr-1" />
+          Buy
+        </Button>
+        <Button
+          variant={activeView === "trade" ? "default" : "ghost"}
+          onClick={() => setActiveView("trade")}
+          className={`${activeView === "trade" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
+        >
+          <ArrowUpDown className="w-4 h-4 mr-1" />
+          Trade
         </Button>
         <Button
           variant={activeView === "stats" ? "default" : "ghost"}
           onClick={() => setActiveView("stats")}
           className={`${activeView === "stats" ? "neon-button" : "text-gray-300 hover:text-white"} text-sm`}
         >
-          <TrendingUp className="w-4 h-4 mr-2" />
-          Token Stats
+          <TrendingUp className="w-4 h-4 mr-1" />
+          Stats
         </Button>
       </div>
 
@@ -226,6 +235,13 @@ export default function BaseAppTokenSwap() {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {activeView === "trade" && (
+        <TokenSwapIntegration
+          tokenAddress={process.env.NEXT_PUBLIC_BASE_APP_TOKEN_ADDRESS}
+          tokenSymbol="BAPP"
+        />
       )}
 
       {activeView === "stats" && (
