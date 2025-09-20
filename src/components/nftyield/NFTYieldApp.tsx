@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
-import { useMiniAppSdk } from '~/hooks/useMiniAppSdk';
+import { useMiniAppSdk } from '~/hooks/use-miniapp-sdk';
 
 interface NFTYieldAppProps {
   className?: string;
 }
 
 export default function NFTYieldApp({ className = '' }: NFTYieldAppProps) {
-  const { isSDKLoaded, fid, username } = useMiniAppSdk();
+  const { isSDKLoaded, context } = useMiniAppSdk();
+  const user = context?.user;
   const [activeTab, setActiveTab] = useState<'portfolio' | 'yield' | 'analytics'>('portfolio');
 
   if (!isSDKLoaded) {
@@ -33,9 +34,9 @@ export default function NFTYieldApp({ className = '' }: NFTYieldAppProps) {
           <p className="text-gray-600 dark:text-gray-300">
             Maximize your NFT portfolio returns
           </p>
-          {username && (
+          {user?.username && (
             <p className="text-sm text-gray-500 mt-2">
-              Welcome back, @{username}
+              Welcome back, @{user.username}
             </p>
           )}
         </div>

@@ -1,17 +1,5 @@
 import { SupportedChainId } from './chains'
-
-export interface NFTContract {
-  address: string
-  name: string
-  symbol: string
-  description: string
-  image?: string
-  chainId: SupportedChainId
-  type: 'ERC721' | 'ERC1155'
-  mintPrice?: string
-  maxSupply?: number
-  baseTokenURI?: string
-}
+import { NFTContract } from '../types/nft'
 
 export const nftContracts: Record<string, NFTContract> = {
   // Base contracts

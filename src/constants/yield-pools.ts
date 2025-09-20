@@ -1,18 +1,4 @@
-export interface YieldPool {
-  id: string
-  name: string
-  description: string
-  apy: number
-  tvl: string
-  token: string
-  protocol: string
-  chainId: number
-  contractAddress: string
-  isActive: boolean
-  riskLevel: 'Low' | 'Medium' | 'High'
-  lockupPeriod?: string
-  minimumDeposit?: string
-}
+import { YieldPool } from '../types/yield'
 
 export const YIELD_POOLS: YieldPool[] = [
   {

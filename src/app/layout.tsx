@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ThemeProviderClient } from "~/components/providers/theme-provider-client";
 import { PROJECT_TITLE, PROJECT_DESCRIPTION } from "~/lib/constants";
 import { Providers } from "~/app/providers";
-import { MinimalNavbar } from "~/components/minimal-navbar";
+import { MinimalNavbar } from "~/components/layout/minimal-navbar";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 
 const appUrl =

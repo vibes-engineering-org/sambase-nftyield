@@ -78,15 +78,17 @@ export type NFTContractType = 'ERC721' | 'ERC1155'
 
 export interface NFTContract {
   address: string
-  chainId: number
-  type: NFTContractType
   name: string
   symbol: string
-  totalSupply?: number
-  maxSupply?: number
+  description: string
+  image?: string
+  chainId: number
+  type: NFTContractType
   mintPrice?: string
+  maxSupply?: number
+  baseTokenURI?: string
+  totalSupply?: number
   publicMintEnabled?: boolean
   whitelistMintEnabled?: boolean
   revealed?: boolean
-  baseTokenURI?: string
 }

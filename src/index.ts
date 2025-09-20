@@ -19,7 +19,7 @@ export { useMiniAppSdk } from './hooks/use-miniapp-sdk'
 export { useProfile } from './hooks/use-profile'
 export { useToast } from './hooks/use-toast'
 export { useSupabaseUpload } from './hooks/use-supabase-upload'
-export { useMobile } from './hooks/use-mobile'
+export { useIsMobile } from './hooks/use-mobile'
 export { useNFTYieldPool } from './hooks/useNFTYieldPool'
 export { useNFTYieldToken } from './hooks/useNFTYieldToken'
 export { useTokenBurnEscrow } from './hooks/useTokenBurnEscrow'
@@ -39,17 +39,17 @@ export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './components/ui/sheet'
 
 // NFT Components
-export { default as NFTCard } from './components/nft/nft-card'
-export { default as NFTMintButton } from './components/nft/nft-mint-button'
-export { default as NFTMintFlow } from './components/nft/nft-mint-flow'
+export { NFTCard } from './components/nft/nft-card'
+export { NFTMintButton } from './components/nft/nft-mint-button'
+export { NFTMintFlow } from './components/nft/nft-mint-flow'
 
 // Yield Components
 export { default as YieldPoolApp } from './components/yield/yield-pool-app'
 export { default as CustomYieldPools } from './components/yield/custom-yield-pools'
 
 // Layout Components
-export { default as AppSidebar } from './components/layout/app-sidebar'
-export { default as MinimalNavbar } from './components/layout/minimal-navbar'
+export { AppSidebar } from './components/layout/app-sidebar'
+export { MinimalNavbar } from './components/layout/minimal-navbar'
 
 // Dashboard Components
 export { default as AdminSection } from './components/dashboard/admin-section'
@@ -57,14 +57,14 @@ export { default as LotteryDisplay } from './components/dashboard/lottery-displa
 export { default as ActivePoolChat } from './components/dashboard/active-pool-chat'
 
 // Shared Components
-export { default as Avatar } from './components/avatar'
-export { default as UserContext } from './components/user-context'
-export { default as ShowCoinBalance } from './components/show-coin-balance'
-export { default as ProfileSearch } from './components/profile-search'
-export { default as OnchainUserSearch } from './components/onchain-user-search'
-export { default as ShareCastButton } from './components/share-cast-button'
-export { default as AddMiniAppButton } from './components/add-miniapp-button'
-export { default as DaimoPayTransferButton } from './components/daimo-pay-transfer-button'
+export { UserAvatar } from './components/avatar'
+export { UserContext } from './components/user-context'
+export { ShowCoinBalance } from './components/show-coin-balance'
+export { ProfileSearch } from './components/profile-search'
+export { OnchainUserSearch } from './components/onchain-user-search'
+export { ShareCastButton } from './components/share-cast-button'
+export { AddMiniappButton } from './components/add-miniapp-button'
+export { DaimoPayTransferButton } from './components/daimo-pay-transfer-button'
 export { default as ReferralSystem } from './components/referral-system'
 export { default as ViralShare } from './components/viral-share'
 export { default as SamishTokenPurchase } from './components/samish-token-purchase'
@@ -72,7 +72,7 @@ export { default as SamishTokenPurchase } from './components/samish-token-purcha
 // File Upload Components
 export { default as FileUploadCard } from './components/FileUploadCard'
 export { default as BucketExplorer } from './components/BucketExplorer'
-export { default as Dropzone } from './components/dropzone'
+export { Dropzone } from './components/dropzone'
 
 // Utility Components
 export { default as VisitorCounter } from './components/VisitorCounter'

@@ -1,6 +1,6 @@
 "use client";
 
-import YieldPoolApp from "~/components/yield-pool-app";
+import YieldPoolApp from "~/components/yield/yield-pool-app";
 
 export default function App() {
   return (
