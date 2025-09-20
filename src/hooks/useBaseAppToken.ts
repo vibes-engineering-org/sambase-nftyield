@@ -96,6 +96,9 @@ const BASE_APP_TOKEN_ABI = [
 // Contract address from environment variables
 const BASE_APP_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_BASE_APP_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000") as Address;
 
+// Check if contract address is configured
+const isContractConfigured = BASE_APP_TOKEN_ADDRESS !== "0x0000000000000000000000000000000000000000";
+
 export function useBaseAppToken() {
   const { address, isConnected } = useAccount();
   const [purchaseAmount, setPurchaseAmount] = useState("");
@@ -112,6 +115,9 @@ export function useBaseAppToken() {
     abi: BASE_APP_TOKEN_ABI,
     functionName: "getContractInfo",
     chainId: base.id,
+    query: {
+      enabled: isContractConfigured,
+    },
   });
 
   const { data: userBalance } = useReadContract({
@@ -120,6 +126,9 @@ export function useBaseAppToken() {
     functionName: "balanceOf",
     args: address ? [address] : undefined,
     chainId: base.id,
+    query: {
+      enabled: isContractConfigured && !!address,
+    },
   });
 
   const { data: currentPrice } = useReadContract({
@@ -127,6 +136,9 @@ export function useBaseAppToken() {
     abi: BASE_APP_TOKEN_ABI,
     functionName: "getCurrentPrice",
     chainId: base.id,
+    query: {
+      enabled: isContractConfigured,
+    },
   });
 
   const { data: purchaseCost } = useReadContract({

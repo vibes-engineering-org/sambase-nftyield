@@ -11,11 +11,13 @@ import { useBaseAppToken } from "~/hooks/useBaseAppToken";
 import { useToast } from "~/hooks/use-toast";
 import TokenSwapIntegration from "~/components/ui/token-swap-integration";
 import TokenManager from "~/components/token-manager";
+import { useConnect } from "wagmi";
 import { Coins, TrendingUp, Wallet, Zap, ArrowUpDown, DollarSign, Settings } from "lucide-react";
 
 export default function BaseAppTokenSwap() {
   const [activeView, setActiveView] = useState<"buy" | "stats" | "trade" | "manage">("buy");
   const { toast } = useToast();
+  const { connect, connectors } = useConnect();
 
   const {
     purchaseAmount,
@@ -57,6 +59,26 @@ export default function BaseAppTokenSwap() {
       toast({
         title: "Purchase Failed",
         description: "Transaction failed. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleConnectWallet = async () => {
+    try {
+      // Try to connect with the first available connector (usually MetaMask or Farcaster)
+      const connector = connectors.find(c => c.name.toLowerCase().includes('farcaster')) || connectors[0];
+      if (connector) {
+        await connect({ connector });
+        toast({
+          title: "Wallet Connected!",
+          description: "Your wallet has been successfully connected."
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect wallet. Please try again.",
         variant: "destructive"
       });
     }
@@ -212,8 +234,8 @@ export default function BaseAppTokenSwap() {
               )}
 
               <Button
-                onClick={handlePurchase}
-                disabled={!isConnected || !purchaseAmount || parseFloat(purchaseAmount) <= 0 || isLoading}
+                onClick={!isConnected ? handleConnectWallet : handlePurchase}
+                disabled={isConnected && (!purchaseAmount || parseFloat(purchaseAmount) <= 0) || isLoading}
                 className="w-full neon-button text-sm py-4"
               >
                 {isLoading ? (

@@ -28,8 +28,16 @@ async function main() {
   console.log("Samish Token:", samishTokenAddress);
 
   try {
-    // 1. Deploy NFTYIELD Token
-    console.log("\n1. Deploying NFTYieldToken...");
+    // 1. Deploy BaseApp Token
+    console.log("\n1. Deploying BaseAppToken...");
+    const BaseAppToken = await ethers.getContractFactory("BaseAppToken");
+    const baseAppToken = await BaseAppToken.deploy();
+    await baseAppToken.waitForDeployment();
+    const baseAppTokenAddress = await baseAppToken.getAddress();
+    console.log("BaseAppToken deployed to:", baseAppTokenAddress);
+
+    // 2. Deploy NFTYIELD Token
+    console.log("\n2. Deploying NFTYieldToken...");
     const NFTYieldToken = await ethers.getContractFactory("NFTYieldToken");
     const nftyToken = await NFTYieldToken.deploy(
       teamWallet,
@@ -41,8 +49,8 @@ async function main() {
     const nftyTokenAddress = await nftyToken.getAddress();
     console.log("NFTYieldToken deployed to:", nftyTokenAddress);
 
-    // 2. Deploy Token Burn Escrow
-    console.log("\n2. Deploying TokenBurnEscrow...");
+    // 3. Deploy Token Burn Escrow
+    console.log("\n3. Deploying TokenBurnEscrow...");
     const TokenBurnEscrow = await ethers.getContractFactory("TokenBurnEscrow");
     const burnEscrow = await TokenBurnEscrow.deploy(
       samishTokenAddress,
@@ -52,8 +60,8 @@ async function main() {
     const burnEscrowAddress = await burnEscrow.getAddress();
     console.log("TokenBurnEscrow deployed to:", burnEscrowAddress);
 
-    // 3. Deploy NFT Yield Pool
-    console.log("\n3. Deploying NFTYieldPool...");
+    // 4. Deploy NFT Yield Pool
+    console.log("\n4. Deploying NFTYieldPool...");
     const NFTYieldPool = await ethers.getContractFactory("NFTYieldPool");
     const yieldPool = await NFTYieldPool.deploy(
       feeRecipient,
@@ -63,8 +71,8 @@ async function main() {
     const yieldPoolAddress = await yieldPool.getAddress();
     console.log("NFTYieldPool deployed to:", yieldPoolAddress);
 
-    // 4. Deploy NFT Yield Factory
-    console.log("\n4. Deploying NFTYieldFactory...");
+    // 5. Deploy NFT Yield Factory
+    console.log("\n5. Deploying NFTYieldFactory...");
     const NFTYieldFactory = await ethers.getContractFactory("NFTYieldFactory");
     const yieldFactory = await NFTYieldFactory.deploy(
       feeRecipient,
@@ -78,8 +86,15 @@ async function main() {
     console.log("\nWaiting for block confirmations...");
     await new Promise(resolve => setTimeout(resolve, 30000));
 
+    // Verify BaseApp token deployment
+    console.log("\n6. Verifying BaseAppToken deployment...");
+    const baseAppTotalSupply = await baseAppToken.totalSupply();
+    const baseAppContractBalance = await baseAppToken.balanceOf(baseAppTokenAddress);
+    console.log("BaseApp Token total supply:", ethers.formatEther(baseAppTotalSupply));
+    console.log("BaseApp Token contract balance:", ethers.formatEther(baseAppContractBalance));
+
     // Verify initial token distribution
-    console.log("\n5. Verifying token distribution...");
+    console.log("\n7. Verifying NFTY token distribution...");
     const totalSupply = await nftyToken.totalSupply();
     console.log("Total NFTY tokens minted:", ethers.formatEther(totalSupply));
 
@@ -95,8 +110,8 @@ async function main() {
     console.log("Treasury allocation (15%):", ethers.formatEther(treasuryBalance), "NFTY");
     console.log("Special allocation (10%) to 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2:", ethers.formatEther(specialBalance), "NFTY");
 
-    // 6. Update factory with pool implementation
-    console.log("\n6. Setting up factory templates...");
+    // 8. Update factory with pool implementation
+    console.log("\n8. Setting up factory templates...");
 
     // Create the first template with the deployed pool implementation
     await yieldFactory.updateTemplateImplementation(1, yieldPoolAddress);
@@ -105,7 +120,7 @@ async function main() {
 
     console.log("Factory templates configured with pool implementation");
 
-    // 7. Output deployment summary
+    // 9. Output deployment summary
     console.log("\n" + "=".repeat(60));
     console.log("DEPLOYMENT SUMMARY");
     console.log("=".repeat(60));
@@ -114,6 +129,7 @@ async function main() {
     console.log("Gas Price:", ethers.formatUnits(await ethers.provider.getFeeData().then(f => f.gasPrice || 0), "gwei"), "gwei");
     console.log("");
     console.log("Contract Addresses:");
+    console.log("BaseAppToken (BAPP):", baseAppTokenAddress);
     console.log("NFTYieldToken (NFTY):", nftyTokenAddress);
     console.log("TokenBurnEscrow:", burnEscrowAddress);
     console.log("NFTYieldPool:", yieldPoolAddress);
@@ -125,7 +141,7 @@ async function main() {
     console.log("Lottery Wallet:", lotteryWallet);
     console.log("=".repeat(60));
 
-    // 8. Save deployment info to file
+    // 10. Save deployment info to file
     const deploymentInfo = {
       network: await ethers.provider.getNetwork().then(n => n.name),
       chainId: await ethers.provider.getNetwork().then(n => n.chainId),
@@ -133,6 +149,7 @@ async function main() {
       timestamp: new Date().toISOString(),
       deployer: deployer.address,
       contracts: {
+        BaseAppToken: baseAppTokenAddress,
         NFTYieldToken: nftyTokenAddress,
         TokenBurnEscrow: burnEscrowAddress,
         NFTYieldPool: yieldPoolAddress,
