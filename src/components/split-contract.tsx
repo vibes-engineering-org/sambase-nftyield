@@ -11,6 +11,7 @@ import { Separator } from "~/components/ui/separator";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { AlertCircle, CheckCircle, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { WalletConnect } from "~/components/ui/wallet-connect";
 
 const MARKETING_WALLET = "0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2";
 const MARKETING_PERCENTAGE = 10;
@@ -200,17 +201,37 @@ export default function SplitContract() {
 
   if (!isConnected) {
     return (
-      <Card className="w-full max-w-md mx-auto bg-gray-900/90 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Revenue Splits</CardTitle>
-          <CardDescription className="text-gray-400">
-            Automated revenue distribution system
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-400 text-center">Please connect your wallet to continue</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <Card className="w-full max-w-md mx-auto bg-gray-900/90 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Revenue Splits</CardTitle>
+            <CardDescription className="text-gray-400">
+              Automated revenue distribution with marketing allocation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <h4 className="text-white text-sm font-medium">Features:</h4>
+              <ul className="text-xs text-gray-400 space-y-1">
+                <li>• Automatic 10% marketing allocation</li>
+                <li>• Custom recipient percentages</li>
+                <li>• Instant distribution on payment</li>
+                <li>• Support for ETH and ERC20 tokens</li>
+                <li>• Multiple split configurations</li>
+                <li>• On-chain transparency</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        <WalletConnect
+          onConnected={() => {
+            // Optionally refresh split data when connected
+            console.log("Wallet connected for splits");
+          }}
+          className="w-full max-w-md mx-auto"
+        />
+      </div>
     );
   }
 
@@ -255,13 +276,19 @@ export default function SplitContract() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-gray-900/90 border-gray-700">
-      <CardHeader>
-        <CardTitle className="text-white">Revenue Splits</CardTitle>
-        <CardDescription className="text-gray-400">
-          Automated revenue distribution with marketing allocation
-        </CardDescription>
-      </CardHeader>
+    <div className="space-y-4">
+      <WalletConnect
+        showHeader={false}
+        className="w-full max-w-md mx-auto"
+      />
+
+      <Card className="w-full max-w-md mx-auto bg-gray-900/90 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-white">Revenue Splits</CardTitle>
+          <CardDescription className="text-gray-400">
+            Automated revenue distribution with marketing allocation
+          </CardDescription>
+        </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-gray-800">
@@ -447,5 +474,6 @@ export default function SplitContract() {
         </Tabs>
       </CardContent>
     </Card>
+    </div>
   );
 }
