@@ -8,6 +8,8 @@ import { Badge } from "~/components/ui/badge";
 import { useToast } from "~/hooks/use-toast";
 import { useMiniAppSdk } from "~/hooks/use-miniapp-sdk";
 import { useAccount } from "wagmi";
+import WalletConnectButton from "~/components/wallet-connect-button";
+import TokenHolderVerification from "~/components/token-holder-verification";
 import {
   MessageSquare,
   Send,
@@ -47,6 +49,8 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
   const [newMessage, setNewMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [hasActivePool, setHasActivePool] = useState(false);
+  const [isTokenHolder, setIsTokenHolder] = useState(false);
+  const [verificationDetails, setVerificationDetails] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const sdk = useMiniAppSdk();
@@ -70,6 +74,17 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
     setIsConnected(connected);
     setHasActivePool(hasActivePoolCheck);
   }, [walletConnected, address, userPools]);
+
+  // Handle wallet connection changes
+  const handleWalletConnectionChange = (connected: boolean, walletAddress?: string) => {
+    setIsConnected(connected);
+  };
+
+  // Handle token holder verification changes
+  const handleVerificationChange = (verified: boolean, details: any) => {
+    setIsTokenHolder(verified);
+    setVerificationDetails(details);
+  };
 
   // Load messages from localStorage and add system messages
   useEffect(() => {
@@ -159,10 +174,10 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
       return;
     }
 
-    if (!hasActivePool) {
+    if (!isTokenHolder) {
       toast({
-        title: "Active Pool Required",
-        description: "You need an active NFT yield pool to access this chat",
+        title: "Token Holder Verification Required",
+        description: "You need to hold and stake NFTY tokens or have an active pool to access this chat",
         variant: "destructive"
       });
       return;
@@ -210,7 +225,7 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
   };
 
   // Access denied state
-  if (!isConnected || !hasActivePool) {
+  if (!isConnected || !isTokenHolder) {
     return (
       <div className="space-y-4">
         <Card className="neon-card">
@@ -226,9 +241,9 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-red-400">Exclusive Pool Chat</h3>
+                <h3 className="text-xl font-bold text-red-400">Exclusive Token Holder Chat</h3>
                 <p className="text-gray-300 text-sm max-w-sm mx-auto">
-                  This chat is reserved for active NFT yield pool participants with burned Samish tokens
+                  This chat is reserved for verified NFTY token holders with staked tokens or active pools
                 </p>
               </div>
 
@@ -240,30 +255,29 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
                     {isConnected ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   </div>
 
-                  <div className={`flex items-center gap-3 ${hasActivePool ? "text-green-400" : "text-red-400"}`}>
-                    <div className={`w-2 h-2 rounded-full ${hasActivePool ? "bg-green-400" : "bg-red-400"}`}></div>
-                    <span className="text-sm">Active Pool Required</span>
-                    {hasActivePool ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  <div className={`flex items-center gap-3 ${isTokenHolder ? "text-green-400" : "text-red-400"}`}>
+                    <div className={`w-2 h-2 rounded-full ${isTokenHolder ? "bg-green-400" : "bg-red-400"}`}></div>
+                    <span className="text-sm">Token Holder Verification</span>
+                    {isTokenHolder ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   </div>
                 </div>
 
                 {!isConnected && (
-                  <Button className="w-full neon-button text-sm">
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Connect Wallet
-                  </Button>
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-400 mb-2">
+                      Connect your wallet to access token holder verification
+                    </p>
+                  </div>
                 )}
 
-                {isConnected && !hasActivePool && (
+                {isConnected && !isTokenHolder && (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-400">
-                      Create an NFT yield pool and burn Samish tokens to unlock chat access
+                      Hold and stake NFTY tokens or create an active pool to unlock chat access
                     </p>
                     <div className="flex items-center justify-center gap-2 text-xs text-orange-400">
                       <Flame className="w-3 h-3" />
-                      <span>Active pools: {userPools.filter(p => p.status === "active").length}</span>
-                      <span>•</span>
-                      <span>Burned: ${(parseFloat(totalBurned) * 0.05).toFixed(2)}</span>
+                      <span>Requirements: 1000+ NFTY tokens + staking/active pool</span>
                     </div>
                   </div>
                 )}
@@ -271,6 +285,24 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
             </div>
           </CardContent>
         </Card>
+
+        {/* Wallet Connection Component */}
+        {!isConnected && (
+          <WalletConnectButton
+            onConnectionChange={handleWalletConnectionChange}
+            showDetails={true}
+          />
+        )}
+
+        {/* Token Holder Verification Component */}
+        {isConnected && (
+          <TokenHolderVerification
+            minimumTokens="1000"
+            minimumStaked="500"
+            onVerificationChange={handleVerificationChange}
+            showDetails={true}
+          />
+        )}
       </div>
     );
   }

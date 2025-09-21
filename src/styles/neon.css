@@ -84,6 +84,36 @@
     0 0 40px #ff00ff;
 }
 
+.neon-button-success {
+  background: linear-gradient(45deg, #00ff88, #00dd88);
+  border: none;
+  color: #000;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.neon-button-success:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 20px #00ff88,
+    0 0 40px #00dd88;
+}
+
+.neon-button-danger {
+  background: linear-gradient(45deg, #ff4444, #dd4444);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.neon-button-danger:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 20px #ff4444,
+    0 0 40px #dd4444;
+}
+
 .cyber-grid {
   background-image:
     linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
