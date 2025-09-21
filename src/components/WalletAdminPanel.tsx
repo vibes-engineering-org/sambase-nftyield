@@ -39,8 +39,9 @@ export default function WalletAdminPanel({ className = "" }: WalletAdminPanelPro
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Simple admin check - in production, this should be more robust
-  const isAdmin = address?.toLowerCase() === "0x1234567890123456789012345678901234567890"; // Replace with actual admin address
+  // Simple admin check - allow any connected wallet for demo purposes
+  // In production, you would check against a whitelist or contract role
+  const isAdmin = isConnected && address; // For demo: any connected wallet is admin
 
   const handleSaveConfig = () => {
     if (!tempMinBapp || parseFloat(tempMinBapp) < 0) {
