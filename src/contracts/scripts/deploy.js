@@ -82,6 +82,14 @@ async function main() {
     const yieldFactoryAddress = await yieldFactory.getAddress();
     console.log("NFTYieldFactory deployed to:", yieldFactoryAddress);
 
+    // 6. Deploy NFTYield Splits Contract
+    console.log("\n6. Deploying NFTYieldSplits...");
+    const NFTYieldSplits = await ethers.getContractFactory("NFTYieldSplits");
+    const splitsContract = await NFTYieldSplits.deploy(feeRecipient);
+    await splitsContract.waitForDeployment();
+    const splitsAddress = await splitsContract.getAddress();
+    console.log("NFTYieldSplits deployed to:", splitsAddress);
+
     // Wait for a few block confirmations
     console.log("\nWaiting for block confirmations...");
     await new Promise(resolve => setTimeout(resolve, 30000));
@@ -110,8 +118,8 @@ async function main() {
     console.log("Treasury allocation (15%):", ethers.formatEther(treasuryBalance), "NFTY");
     console.log("Special allocation (10%) to 0x5d7ECF67eD425F30bfDb164A8880D1D652be79B2:", ethers.formatEther(specialBalance), "NFTY");
 
-    // 8. Update factory with pool implementation
-    console.log("\n8. Setting up factory templates...");
+    // 7. Update factory with pool implementation
+    console.log("\n7. Setting up factory templates...");
 
     // Create the first template with the deployed pool implementation
     await yieldFactory.updateTemplateImplementation(1, yieldPoolAddress);
@@ -120,7 +128,7 @@ async function main() {
 
     console.log("Factory templates configured with pool implementation");
 
-    // 9. Output deployment summary
+    // 8. Output deployment summary
     console.log("\n" + "=".repeat(60));
     console.log("DEPLOYMENT SUMMARY");
     console.log("=".repeat(60));
@@ -134,6 +142,7 @@ async function main() {
     console.log("TokenBurnEscrow:", burnEscrowAddress);
     console.log("NFTYieldPool:", yieldPoolAddress);
     console.log("NFTYieldFactory:", yieldFactoryAddress);
+    console.log("NFTYieldSplits:", splitsAddress);
     console.log("");
     console.log("Configuration:");
     console.log("Samish Token:", samishTokenAddress);
@@ -141,7 +150,7 @@ async function main() {
     console.log("Lottery Wallet:", lotteryWallet);
     console.log("=".repeat(60));
 
-    // 10. Save deployment info to file
+    // 9. Save deployment info to file
     const deploymentInfo = {
       network: await ethers.provider.getNetwork().then(n => n.name),
       chainId: await ethers.provider.getNetwork().then(n => n.chainId),
@@ -153,7 +162,8 @@ async function main() {
         NFTYieldToken: nftyTokenAddress,
         TokenBurnEscrow: burnEscrowAddress,
         NFTYieldPool: yieldPoolAddress,
-        NFTYieldFactory: yieldFactoryAddress
+        NFTYieldFactory: yieldFactoryAddress,
+        NFTYieldSplits: splitsAddress
       },
       configuration: {
         samishToken: samishTokenAddress,
