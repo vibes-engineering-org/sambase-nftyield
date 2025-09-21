@@ -7,14 +7,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import YieldPoolApp from "~/components/yield/yield-pool-app";
 import BaseAppTokenSwap from "~/components/base-app-token-swap";
 import SplitContract from "~/components/split-contract";
-import { Coins, TrendingUp, Star, Split } from "lucide-react";
+import UnifiedWalletConnect from "~/components/UnifiedWalletConnect";
+import WalletAdminPanel from "~/components/WalletAdminPanel";
+import { useWallet } from "~/contexts/WalletContext";
+import { Coins, TrendingUp, Star, Split, Settings, Wallet } from "lucide-react";
 
 export default function App() {
-  const [activeApp, setActiveApp] = useState<"nftyield" | "basetoken" | "split">("basetoken");
+  const [activeApp, setActiveApp] = useState<"nftyield" | "basetoken" | "split" | "wallet" | "admin">("basetoken");
+  const { isConnected, isTokenVerified } = useWallet();
 
   return (
     <div className="min-h-screen bg-black">
       {/* TEMPLATE_CONTENT_START - Replace content below */}
+
+      {/* Global Wallet Status Bar */}
+      <div className="w-full max-w-md mx-auto p-3 pb-0">
+        <UnifiedWalletConnect variant="status" />
+      </div>
 
       {/* App Switcher Header */}
       <div className="w-full max-w-md mx-auto p-3">
@@ -35,31 +44,51 @@ export default function App() {
         </div>
 
         {/* App Selection */}
-        <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border mb-4">
-          <Button
-            variant={activeApp === "basetoken" ? "default" : "ghost"}
-            onClick={() => setActiveApp("basetoken")}
-            className={`${activeApp === "basetoken" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Coins className="w-4 h-4 mr-1" />
-            BAPP Token
-          </Button>
-          <Button
-            variant={activeApp === "nftyield" ? "default" : "ghost"}
-            onClick={() => setActiveApp("nftyield")}
-            className={`${activeApp === "nftyield" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <TrendingUp className="w-4 h-4 mr-1" />
-            NFT Yield
-          </Button>
-          <Button
-            variant={activeApp === "split" ? "default" : "ghost"}
-            onClick={() => setActiveApp("split")}
-            className={`${activeApp === "split" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
-          >
-            <Split className="w-4 h-4 mr-1" />
-            Split
-          </Button>
+        <div className="space-y-2">
+          <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
+            <Button
+              variant={activeApp === "basetoken" ? "default" : "ghost"}
+              onClick={() => setActiveApp("basetoken")}
+              className={`${activeApp === "basetoken" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Coins className="w-4 h-4 mr-1" />
+              BAPP Token
+            </Button>
+            <Button
+              variant={activeApp === "nftyield" ? "default" : "ghost"}
+              onClick={() => setActiveApp("nftyield")}
+              className={`${activeApp === "nftyield" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <TrendingUp className="w-4 h-4 mr-1" />
+              NFT Yield
+            </Button>
+            <Button
+              variant={activeApp === "split" ? "default" : "ghost"}
+              onClick={() => setActiveApp("split")}
+              className={`${activeApp === "split" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Split className="w-4 h-4 mr-1" />
+              Split
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-2 p-1 bg-gray-900/80 rounded-lg neon-border">
+            <Button
+              variant={activeApp === "wallet" ? "default" : "ghost"}
+              onClick={() => setActiveApp("wallet")}
+              className={`${activeApp === "wallet" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Wallet className="w-4 h-4 mr-1" />
+              Wallet
+            </Button>
+            <Button
+              variant={activeApp === "admin" ? "default" : "ghost"}
+              onClick={() => setActiveApp("admin")}
+              className={`${activeApp === "admin" ? "neon-button" : "text-gray-300 hover:text-white"} text-xs`}
+            >
+              <Settings className="w-4 h-4 mr-1" />
+              Admin
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -77,6 +106,21 @@ export default function App() {
       {activeApp === "split" && (
         <div className="w-full max-w-md mx-auto p-3">
           <SplitContract />
+        </div>
+      )}
+
+      {activeApp === "wallet" && (
+        <div className="w-full max-w-md mx-auto p-3">
+          <UnifiedWalletConnect
+            showDetails={true}
+            variant="full"
+          />
+        </div>
+      )}
+
+      {activeApp === "admin" && (
+        <div className="w-full max-w-md mx-auto p-3">
+          <WalletAdminPanel />
         </div>
       )}
 

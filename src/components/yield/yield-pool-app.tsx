@@ -13,7 +13,7 @@ import AdminSection from "~/components/admin-section";
 import ViralShare from "~/components/viral-share";
 import ReferralSystem from "~/components/referral-system";
 import CustomYieldPools from "~/components/custom-yield-pools";
-import ActivePoolChat from "~/components/active-pool-chat";
+import ActivePoolChat from "~/components/dashboard/active-pool-chat";
 import { Zap, Settings, Share2, TrendingUp, Star, Lock, Flame, Users, Gift, MessageSquare, Wrench, Trophy, Coins } from "lucide-react";
 import "~/styles/neon.css";
 import SamishTokenPurchase from "~/components/samish-token-purchase";

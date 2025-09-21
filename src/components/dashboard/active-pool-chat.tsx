@@ -7,9 +7,8 @@ import { Input } from "~/components/ui/input";
 import { Badge } from "~/components/ui/badge";
 import { useToast } from "~/hooks/use-toast";
 import { useMiniAppSdk } from "~/hooks/use-miniapp-sdk";
-import { useAccount } from "wagmi";
-import WalletConnectButton from "~/components/wallet-connect-button";
-import TokenHolderVerification from "~/components/token-holder-verification";
+import { useWallet } from "~/contexts/WalletContext";
+import UnifiedWalletConnect from "~/components/UnifiedWalletConnect";
 import {
   MessageSquare,
   Send,
@@ -47,43 +46,29 @@ interface ActivePoolChatProps {
 export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
-  const [hasActivePool, setHasActivePool] = useState(false);
-  const [isTokenHolder, setIsTokenHolder] = useState(false);
-  const [verificationDetails, setVerificationDetails] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const sdk = useMiniAppSdk();
-  const { address, isConnected: walletConnected } = useAccount();
+  const {
+    address,
+    isConnected,
+    isTokenVerified,
+    hasBappTokens,
+    hasUsedNFTYield,
+    hasBurnedSamish,
+    bappBalance,
+    minBappAmount,
+    formatAddress
+  } = useWallet();
 
   // Current user data
   const currentUser = {
     address: address || (sdk?.context?.user?.fid ? `0x${sdk.context.user.fid.toString(16).padStart(40, '0')}` : ""),
-    username: sdk?.context?.user?.username || address?.slice(0, 6) || "Anonymous",
+    username: sdk?.context?.user?.username || formatAddress(address) || "Anonymous",
     avatar: sdk?.context?.user?.pfpUrl,
     poolCount: userPools.filter(pool => pool.status === "active").length,
     burnedTokens: parseFloat(totalBurned) || 0,
-    isVerified: userPools.filter(pool => pool.status === "active").length >= 1
-  };
-
-  // Check wallet connection and active pool status
-  useEffect(() => {
-    const connected = Boolean(walletConnected && address);
-    const hasActivePoolCheck = userPools.some(pool => pool.status === "active");
-
-    setIsConnected(connected);
-    setHasActivePool(hasActivePoolCheck);
-  }, [walletConnected, address, userPools]);
-
-  // Handle wallet connection changes
-  const handleWalletConnectionChange = (connected: boolean, walletAddress?: string) => {
-    setIsConnected(connected);
-  };
-
-  // Handle token holder verification changes
-  const handleVerificationChange = (verified: boolean, details: any) => {
-    setIsTokenHolder(verified);
-    setVerificationDetails(details);
+    isVerified: isTokenVerified
   };
 
   // Load messages from localStorage and add system messages
@@ -174,10 +159,10 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
       return;
     }
 
-    if (!isTokenHolder) {
+    if (!isTokenVerified) {
       toast({
-        title: "Token Holder Verification Required",
-        description: "You need to hold and stake NFTY tokens or have an active pool to access this chat",
+        title: "Token Verification Required",
+        description: `You need to hold ≥${minBappAmount} $BAPP tokens, use NFT Yield protocol, and burn $samish tokens to access this chat`,
         variant: "destructive"
       });
       return;
@@ -225,7 +210,7 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
   };
 
   // Access denied state
-  if (!isConnected || !isTokenHolder) {
+  if (!isConnected || !isTokenVerified) {
     return (
       <div className="space-y-4">
         <Card className="neon-card">
@@ -241,9 +226,9 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-red-400">Exclusive Token Holder Chat</h3>
+                <h3 className="text-xl font-bold text-red-400">Exclusive Community Chat</h3>
                 <p className="text-gray-300 text-sm max-w-sm mx-auto">
-                  This chat is reserved for verified NFTY token holders with staked tokens or active pools
+                  This chat requires $BAPP token holdings, NFT Yield protocol usage, and burned $samish tokens
                 </p>
               </div>
 
@@ -255,29 +240,33 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
                     {isConnected ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   </div>
 
-                  <div className={`flex items-center gap-3 ${isTokenHolder ? "text-green-400" : "text-red-400"}`}>
-                    <div className={`w-2 h-2 rounded-full ${isTokenHolder ? "bg-green-400" : "bg-red-400"}`}></div>
-                    <span className="text-sm">Token Holder Verification</span>
-                    {isTokenHolder ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  <div className={`flex items-center gap-3 ${hasBappTokens ? "text-green-400" : "text-red-400"}`}>
+                    <div className={`w-2 h-2 rounded-full ${hasBappTokens ? "bg-green-400" : "bg-red-400"}`}></div>
+                    <span className="text-sm">Hold ≥{minBappAmount} $BAPP tokens</span>
+                    {hasBappTokens ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  </div>
+
+                  <div className={`flex items-center gap-3 ${hasUsedNFTYield ? "text-green-400" : "text-red-400"}`}>
+                    <div className={`w-2 h-2 rounded-full ${hasUsedNFTYield ? "bg-green-400" : "bg-red-400"}`}></div>
+                    <span className="text-sm">Used NFT Yield Protocol</span>
+                    {hasUsedNFTYield ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  </div>
+
+                  <div className={`flex items-center gap-3 ${hasBurnedSamish ? "text-green-400" : "text-red-400"}`}>
+                    <div className={`w-2 h-2 rounded-full ${hasBurnedSamish ? "bg-green-400" : "bg-red-400"}`}></div>
+                    <span className="text-sm">Burned $samish creator tokens</span>
+                    {hasBurnedSamish ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   </div>
                 </div>
 
-                {!isConnected && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-400 mb-2">
-                      Connect your wallet to access token holder verification
-                    </p>
-                  </div>
-                )}
-
-                {isConnected && !isTokenHolder && (
+                {isConnected && (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-400">
-                      Hold and stake NFTY tokens or create an active pool to unlock chat access
+                      Current $BAPP balance: {parseFloat(bappBalance).toFixed(2)} tokens
                     </p>
                     <div className="flex items-center justify-center gap-2 text-xs text-orange-400">
                       <Flame className="w-3 h-3" />
-                      <span>Requirements: 1000+ NFTY tokens + staking/active pool</span>
+                      <span>All three requirements must be met for chat access</span>
                     </div>
                   </div>
                 )}
@@ -286,23 +275,11 @@ export default function ActivePoolChat({ userPools, totalBurned }: ActivePoolCha
           </CardContent>
         </Card>
 
-        {/* Wallet Connection Component */}
-        {!isConnected && (
-          <WalletConnectButton
-            onConnectionChange={handleWalletConnectionChange}
-            showDetails={true}
-          />
-        )}
-
-        {/* Token Holder Verification Component */}
-        {isConnected && (
-          <TokenHolderVerification
-            minimumTokens="1000"
-            minimumStaked="500"
-            onVerificationChange={handleVerificationChange}
-            showDetails={true}
-          />
-        )}
+        {/* Unified Wallet Connection Component */}
+        <UnifiedWalletConnect
+          showDetails={true}
+          variant="full"
+        />
       </div>
     );
   }
